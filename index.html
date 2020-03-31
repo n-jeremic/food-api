@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <link rel="stylesheet" href="./popover/jquery-popover-0.0.3.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://kit.fontawesome.com/d4b741b49f.js" crossorigin="anonymous"></script>
+  </head>
+  <body onload="initApp();">
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-success">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+        </ul>
+      </div>
+    </nav> -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-10" style="padding: 20px !important">
+          <div class="row">
+            <div class="col-3">
+              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="v-pills-popular_recipes-tab" data-toggle="pill" href="#v-pills-popular_recipes" role="tab" aria-controls="v-pills-home" aria-selected="true" onclick="displayRandomRecipesTab();">Popular recipes</a>
+                <a class="nav-link" id="v-pills-recipe_search-tab" data-toggle="pill" href="#v-pills-recipe_search" role="tab" aria-controls="v-pills-profile" aria-selected="false" onclick="displaySearchTab();">Recipe search</a>
+                <a class="nav-link" id="v-pills-mealPlan-tab" data-toggle="pill" href="#v-pills-mealPlan" role="tab" aria-controls="v-pills-mealPlan" aria-selected="false" onclick="goBackToMealPlan();">Meal plan</a>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="v-pills-popular_recipes" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                  <div class="row" id="randomRecipes-tab"></div>
+                  <div class="row" id="main-spinner">
+                    <div class="col-lg-12">
+                      <div class="d-flex justify-content-center" style="color: #33cc33;">
+                        <div class="spinner-border" role="status" style="width: 6rem; height: 6rem; margin-top: 200px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row" id="recipeInfo-tab" style="display: none; margin-bottom: 150px !important;">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding-bottom: 15px !important;">
+                      <p style="margin-bottom: 0px !important; margin-top: 8px !important;"><i class="fas fa-arrow-left" style="color: #b3b3b3;" onclick="goBackToRandomRecipes();" data-toggle="tooltip" data-placement="top" title="Go Back To Popular Recipes"></i></i></p>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <h1 class="text-center mb-4" id="recipeInfo--title"></h1>
+                        </div>
+                        <div class="col-lg-5">
+                          <img src="" alt="" width="100%" style="object-fit: cover;" id="recipeInfo--image" class="rounded shadow-sm" />
+                        </div>
+                        <div class="col-lg-4" style="margin-bottom: 0px !important;"><div class="p--modified alert alert-warning" role="alert" id="recipeInfo--middleTab"></div></div>
+                        <div class="col-lg-3" style="padding: 10px 40px;" id="recipeInfo--dietTab"></div>
+                      </div>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <div class="card shadow-sm">
+                            <div class="card-body">
+                              <h5 class="card-title">Recipe description</h5>
+                              <p class="card-text" id="recipe-summary"></p>
+                              <div id="recipe-summary-buttons"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                              <a class="nav-item nav-link active" id="nav-ingredients-tab" data-toggle="tab" href="#nav-ingredients" role="tab" aria-controls="nav-ingredients" aria-selected="true">Ingredients</a>
+                              <a class="nav-item nav-link" id="nav-instructions-tab" data-toggle="tab" href="#nav-instructions" role="tab" aria-controls="nav-instructions" aria-selected="false">Instructions</a>
+                              <a class="nav-item nav-link" id="nav-nutrition-tab" data-toggle="tab" href="#nav-nutrition" role="tab" aria-controls="nav-nutrition" aria-selected="false">Recipe nutrition</a>
+                              <a class="nav-item nav-link" id="nav-pairing-tab" data-toggle="tab" href="#nav-pairing" role="tab" aria-controls="nav-pairing" aria-selected="false" style="display: none;">Wine pairing</a>
+                            </div>
+                          </nav>
+                          <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-ingredients" role="tabpanel" aria-labelledby="nav-ingredients-tab">
+                              <h4>Necessary ingredients:</h4>
+                              <div class="row" id="ingredients-row"></div>
+                              <h4 class="mb-3" id="equip-title">Necessary equipment:</h4>
+                              <div class="row" id="equipment-row"></div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-instructions" role="tabpanel" aria-labelledby="nav-instructions-tab">
+                              <h4 class="mb-3">Step by step:</h4>
+                              <div id="instructions" class="list-group"></div>
+                            </div>
+                            <div class="tab-pane fade" style="padding: 0px 20px 20px 20px" id="nav-nutrition" role="tabpanel" aria-labelledby="nav-nutrition-tab">
+                              <div class="row">
+                                <div class="col-lg-12" id="nutrition-widget"></div>
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-pairing" role="tabpanel" aria-labelledby="nav-pairing-tab">
+                              <div class="card mb-4">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">
+                                  Wine tips
+                                </h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wine-types"></h5>
+                                  <p class="card-text" id="wine-text"></p>
+                                </div>
+                              </div>
+                              <div class="card" id="productMatches-card" style="display: none;">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">Matched product</h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wineMatch-title">Malbec Reserve</h5>
+                                  <div class="row">
+                                    <div class="col-lg-3">
+                                      <img src="http://placehold.it/200x350" id="wineMatch-image" width="100%" style="object-fit: cover; margin-top: 20px;" alt="" />
+                                    </div>
+                                    <div class="col-lg-9">
+                                      <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><span style="font-weight: 600;">Average rating: </span><span id="wineMatch-rating">0.9</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Rating count: </span><span id="wineMatch-ratingCount">42</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Score: </span><span id="wineMatch-score">0.67</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Price: </span><span id="wineMatch-price">$32.21</span></li>
+                                        <li class="list-group-item">
+                                          <span style="font-weight: 600;">Description: </span>
+                                          <span id="wineMatch-description"
+                                            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque eos asperiores vel ipsum fuga voluptatum obcaecati qui reprehenderit unde impedit ex, quo ullam minima minus quam accusantium? Voluptates,
+                                            repellat veritatis.</span
+                                          >
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="v-pills-recipe_search" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                  <div class="row" id="main-spinner-searchTab" style="display: none;">
+                    <div class="col-lg-12">
+                      <div class="d-flex justify-content-center" style="color: #33cc33;">
+                        <div class="spinner-border" role="status" style="width: 6rem; height: 6rem; margin-top: 200px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row" id="recipe-search-main-container">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding: 15px !important;">
+                      <div class="card shadow-sm">
+                        <h5 class="card-header">Smart search</h5>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-lg-6">
+                              <input type="text" class="form-control form-control-lg" placeholder="Type here what you want to search for..." / id="search-input-main">
+                            </div>
+                            <div class="col-lg-3">
+                              <button class="btn btn-block btn-lg btn-warning" onclick="performSearch(this)"><i class="fas fa-search mr-2"></i>Search</button>
+                            </div>
+                            <div class="col-lg-3">
+                              <button class="btn btn-link btn-block mt-2" type="button" data-toggle="collapse" data-target="#simpleFilterCollapse" aria-expanded="false" aria-controls="simpleFilterCollapse">
+                                Add filters<i class="fas fa-chevron-down ml-2"></i>
+                              </button>
+                            </div>
+                            <div class="col-lg-12 mt-4">
+                              <div class="collapse" id="simpleFilterCollapse">
+                                <div class="card card-body shadow-sm" style="padding: 10px 10px 20px 10px !important">
+                                  <h5 class="card-title">Filter options: <button class="btn btn-light btn-sm float-right text-danger" onclick="clearAllFilters(this);" id="clearFiltersBtn" style="visibility: hidden;">Clear filters</button></h5>
+                                  <div class="row" style="margin-bottom: 12px;">
+                                    <div class="col-lg-4">
+                                      <div class="dropdown">
+                                        <label for="mealType-text-input" class="mr-2">Meal type:</label>
+                                        <input type="text" class="form-control dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="mealType-text-input" readonly />
+                                        <div class="dropdown-menu intolerance-dropdown">
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Main Course', 'mealType');" class="custom-control-input" id="main-course-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="main-course-check">Main Course</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Side Dish', 'mealType');" class="custom-control-input" id="side-dish-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="side-dish-check">Side dish</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Appetizer', 'mealType');" class="custom-control-input" id="appetizer-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="appetizer-check">Appetizer</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Dessert', 'mealType');" class="custom-control-input" id="dessert-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="dessert-check">Dessert</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Salad', 'mealType');" class="custom-control-input" id="salad-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="salad-check">Salad</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Bread', 'mealType');" class="custom-control-input" id="bread-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="bread-check">Bread</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Breakfast', 'mealType');" class="custom-control-input" id="breakfast-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="breakfast-check">Breakfast</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Soup', 'mealType');" class="custom-control-input" id="soup-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="soup-check">Soup</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Beverage', 'mealType');" class="custom-control-input" id="beverage-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="beverage-check">Beverage</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Sauce', 'mealType');" class="custom-control-input" id="sauce-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="sauce-check">Sauce</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Marinade', 'mealType');" class="custom-control-input" id="marinade-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="marinade-check">Marinade</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Fingerfood', 'mealType');" class="custom-control-input" id="fingerfood-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="fingerfood-check">Fingerfood</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Snack', 'mealType');" class="custom-control-input" id="snack-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="snack-check">Snack</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Drink', 'mealType');" class="custom-control-input" id="drink-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="drink-check">Drink</label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                      <label for="diet-filter" class="mr-2">Diet:</label fo>
+                                      <select name="" id="diet-filter" class="form-control">
+                                        <option value="null">Choose...</option>
+                                        <option value="gluten-free">Gluten Free</option>
+                                        <option value="ketogenic">Ketogenic</option>
+                                        <option value="vegeterian">Vegeterian</option>
+                                        <option value="lacto-vegeterian">Lacto - Vegeterian</option>
+                                        <option value="ovo-vegeterian">Ovo - Vegeterian</option>
+                                        <option value="vegan">Vegan</option>
+                                        <option value="pesceterian">Pesceterian</option>
+                                        <option value="paleo">Paleo</option>
+                                        <option value="primal">Primal</option>
+                                        <option value="whole30">Whole 30</option>
+                                      </select>
+                                    </div>
+                                    <div class="col-lg-4">
+                                      <div class="dropdown">
+                                        <label for="intolerance-text-input" class="mr-2">Intolerance:</label>
+                                        <input type="text" class="form-control dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="intolerance-text-input" readonly />
+                                        <div class="dropdown-menu intolerance-dropdown">
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Dairy', 'intolerance');" class="custom-control-input" id="dairy-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="dairy-check">Dairy</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Egg', 'intolerance');" class="custom-control-input" id="egg-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="egg-check">Egg</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Gluten', 'intolerance');" class="custom-control-input" id="gluten-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="gluten-check">Gluten</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Grain', 'intolerance');" class="custom-control-input" id="grain-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="grain-check">Grain</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Peanut', 'intolerance');" class="custom-control-input" id="peanut-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="peanut-check">Peanut</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Seafood', 'intolerance');" class="custom-control-input" id="seafood-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="seafood-check">Seafood</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Sesame', 'intolerance');" class="custom-control-input" id="sesame-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="sesame-check">Sesame</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Soy', 'intolerance');" class="custom-control-input" id="soy-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="soy-check">Soy</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Sulfite', 'intolerance');" class="custom-control-input" id="sulfite-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="sulfite-check">Sulfite</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Tree Nut', 'intolerance');" class="custom-control-input" id="treeNut-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="treeNut-check">Tree Nut</label>
+                                          </div>
+                                          <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" onchange="checkItemInCheckbox(this, 'Wheat', 'intolerance');" class="custom-control-input" id="wheat-check" />
+                                            <label class="custom-control-label" style="width: 100%;" for="wheat-check">Wheat</label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row" style="margin-bottom: 12px;">
+                                    <div class="col-lg-6">
+                                      <p style="margin-bottom: 8px !important;"><label style="margin-bottom: 0px !important;" for="include-ingredients-input" class="mr-2">Include ingredients:</label><span id="included-ingredients"></span></p>
+                                      <div class="dropdown">
+                                        <input type="text" onkeyup="autocompleteIngredientName(this.value, 'include')" onfocus="hideDropdown('include');" class="form-control dropdown-toggle" id="include-ingredients-input" placeholder="Type the ingredient name..." data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" > 
+                                        <div class="dropdown-menu intolerance-dropdown" id="include-ingredients-dropdown">
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                      <p style="margin-bottom: 8px !important;"><label style="margin-bottom: 0px !important;" for="exclude-ingredients-input" class="mr-2">Exclude ingredients:</label><span id="excluded-ingredients"></span></p>
+                                      <div class="dropdown">
+                                        <input type="text" onkeyup="autocompleteIngredientName(this.value, 'exclude')" onfocus="hideDropdown('exclude');" class="form-control dropdown-toggle" id="exclude-ingredients-input" placeholder="Type the ingredient name..." data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" > 
+                                        <div class="dropdown-menu intolerance-dropdown" id="exclude-ingredients-dropdown">
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row">
+                                    <div class="col-lg-3">
+                                      <label for="nutrition-filter" class="mr-2">Nutriton filter:</label fo>
+                                        <select name="" id="nutrition-filter" class="form-control" onchange="selectNutrient(this.value);">
+                                          <option value="null">Select nutrient...</option>
+                                          <option value="Carbohydrates-min:10,max:100,unit:g">Carbohydrates</option>
+                                          <option value="Protein-min:10,max:100,unit:g">Protein</option>
+                                          <option value="Calories-min:50,max:800,unit:cal">Calories</option>
+                                          <option value="Fat-min:1,max:100,unit:g">Fat</option>
+                                          <option value="Alcohol-min:0,max:100,unit:g">Alcohol</option>
+                                          <option value="Caffein-min:0,max:100,unit:mg">Caffein</option>
+                                          <option value="Copper-min:0,max:100,unit:mg">Copper</option>
+                                          <option value="Calcium-min:0,max:100,unit:mg">Calcium</option>
+                                          <option value="Choline-min:0,max:100,unit:mg">Choline</option>
+                                          <option value="Cholesterol-min:0,max:100,unit:mg">Cholesterol</option>
+                                          <option value="Fluoride-min:0,max:100,unit:mg">Fluoride</option>
+                                          <option value="Saturated Fat-min:0,max:100,unit:g">Saturated Fat</option>
+                                          <option value="Vitamin A-min:0,max:100,unit:mcg">Vitamin A</option>
+                                          <option value="Vitamin C-min:0,max:100,unit:mg">Vitamin C</option>
+                                          <option value="Vitamin D-min:0,max:100,unit:mcg">Vitamin D</option>
+                                          <option value="Vitamin E-min:0,max:100,unit:mg">Vitamin E</option>
+                                          <option value="Vitamin K-min:0,max:100,unit:mcg">Vitamin K</option>
+                                          <option value="Vitamin B1-min:0,max:100,unit:mg">Vitamin B1</option>
+                                          <option value="Vitamin B2-min:0,max:100,unit:mg">Vitamin B2</option>
+                                          <option value="Vitamin B3-min:0,max:100,unit:mg">Vitamin B3</option>
+                                          <option value="Vitamin B5-min:0,max:100,unit:mg">Vitamin B5</option>
+                                          <option value="Vitamin B6-min:0,max:100,unit:mg">Vitamin B6</option>
+                                          <option value="Vitamin B12-min:0,max:100,unit:mcg">Vitamin B12</option>
+                                          <option value="Fiber-min:0,max:100,unit:g">Fiber</option>
+                                          <option value="Folate-min:0,max:100,unit:g">Folate</option>
+                                          <option value="Folic Acid-min:0,max:100,unit:g">Folic Acid</option>
+                                          <option value="Iodine-min:0,max:100,unit:g">Iodine</option>
+                                          <option value="Iron-min:0,max:100,unit:mg">Iron</option>
+                                          <option value="Magnesium-min:0,max:100,unit:mg">Magnesium</option>
+                                          <option value="Manganese-min:0,max:100,unit:mg">Manganese</option>
+                                          <option value="Phosphorus-min:0,max:100,unit:mg">Phosphorus</option>
+                                          <option value="Potassium-min:0,max:100,unit:mg">Potassium</option>
+                                          <option value="Selenium-min:0,max:100,unit:g">Selenium</option>
+                                          <option value="Sodium-min:0,max:100,unit:mg">Sodium</option>
+                                          <option value="Sugar-min:0,max:100,unit:g">Sugar</option>
+                                          <option value="Zinc-min:0,max:100,unit:mg">Zinc</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-9" style="padding-top: 22px !important;" id="nutrients-table">
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row mt-5" id="search-results-row" style="display: none;">
+                        <div class="col-lg-12">
+                          <div class="card shadow-sm">
+                            <div class="card-body" style="padding: 10px !important; background-color: rgba(0,0,0,.03);">
+                              <h5 class="card-title mt-2" id="results-header"></h5>
+                              <div class="list-group mt-3" id="results-table">
+                                <button type="button" class="list-group-item list-group-item-action search-results-hover" style="padding: 10px 15px !important;">
+                                  <img src="http://placehold.it/300x200" width="80px" alt="" class="rounded mr-2">
+                                  <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur fuga dolore rem beatae quos.</span><div class="spinner-border text-info float-right mt-3" role="status" style="width: 1.5rem; height: 1.5rem; display: none;"></div>
+                                </button>
+                              </div>
+                              <nav aria-label="Page navigation example" class="mt-4" id="pagination-container" style="display: none;">
+                                <ul class="pagination justify-content-center" id="pages-nav">
+                                  <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                              </nav>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row" id="recipeInfo-tab-searchTab" style="display: none; margin-bottom: 150px !important;">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding-bottom: 15px !important;">
+                      <p style="margin-bottom: 0px !important; margin-top: 8px !important;"><i class="fas fa-arrow-left" style="color: #b3b3b3;" onclick="goBackToSearch();" data-toggle="tooltip" data-placement="top" title="Go Back To Search"></i></p>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <h1 class="text-center mb-4" id="recipeInfo--title-searchTab"></h1>
+                        </div>
+                        <div class="col-lg-5">
+                          <img src="" alt="" width="100%" style="object-fit: cover;" id="recipeInfo--image-searchTab" class="rounded shadow-sm" />
+                        </div>
+                        <div class="col-lg-4" style="margin-bottom: 0px !important;"><div class="p--modified alert alert-warning" role="alert" id="recipeInfo--middleTab-searchTab"></div></div>
+                        <div class="col-lg-3" style="padding: 10px 40px;" id="recipeInfo--dietTab-searchTab"></div>
+                      </div>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <div class="card shadow-sm">
+                            <div class="card-body">
+                              <h5 class="card-title">Recipe description</h5>
+                              <p class="card-text" id="recipe-summary-searchTab"></p>
+                              <div id="recipe-summary-buttons-searchTab"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <nav>
+                            <div class="nav nav-tabs" id="nav-tab-searchTab" role="tablist">
+                              <a class="nav-item nav-link active" id="nav-ingredients-tab-searchTab" data-toggle="tab" href="#nav-ingredients-searchTab" role="tab" aria-controls="nav-ingredients" aria-selected="true">Ingredients</a>
+                              <a class="nav-item nav-link" id="nav-instructions-tab-searchTab" data-toggle="tab" href="#nav-instructions-searchTab" role="tab" aria-controls="nav-instructions" aria-selected="false">Instructions</a>
+                              <a class="nav-item nav-link" id="nav-nutrition-tab-searchTab" data-toggle="tab" href="#nav-nutrition-searchTab" role="tab" aria-controls="nav-nutrition" aria-selected="false">Recipe nutrition</a>
+                              <a class="nav-item nav-link" id="nav-pairing-tab-searchTab" data-toggle="tab" href="#nav-pairing-searchTab" role="tab" aria-controls="nav-pairing" aria-selected="false" style="display: none;">Wine pairing</a>
+                            </div>
+                          </nav>
+                          <div class="tab-content" id="nav-tabContent-searchTab">
+                            <div class="tab-pane fade show active" id="nav-ingredients-searchTab" role="tabpanel" aria-labelledby="nav-ingredients-tab">
+                              <h4>Necessary ingredients:</h4>
+                              <div class="row" id="ingredients-row-searchTab"></div>
+                              <h4 class="mb-3" id="equip-title-searchTab">Necessary equipment:</h4>
+                              <div class="row" id="equipment-row-searchTab"></div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-instructions-searchTab" role="tabpanel" aria-labelledby="nav-instructions-tab">
+                              <h4 class="mb-3">Step by step:</h4>
+                              <div id="instructions-searchTab" class="list-group"></div>
+                            </div>
+                            <div class="tab-pane fade" style="padding: 0px 20px 20px 20px" id="nav-nutrition-searchTab" role="tabpanel" aria-labelledby="nav-nutrition-tab">
+                              <div class="row">
+                                <div class="col-lg-12" id="nutrition-widget-searchTab"></div>
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-pairing-searchTab" role="tabpanel" aria-labelledby="nav-pairing-tab">
+                              <div class="card mb-4">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">
+                                  Wine tips
+                                </h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wine-types-searchTab"></h5>
+                                  <p class="card-text" id="wine-text-searchTab"></p>
+                                </div>
+                              </div>
+                              <div class="card" id="productMatches-card-searchTab" style="display: none;">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">Matched product</h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wineMatch-title-searchTab">Malbec Reserve</h5>
+                                  <div class="row">
+                                    <div class="col-lg-3">
+                                      <img src="http://placehold.it/200x350" id="wineMatch-image-searchTab" width="100%" style="object-fit: cover; margin-top: 20px;" alt="" />
+                                    </div>
+                                    <div class="col-lg-9">
+                                      <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><span style="font-weight: 600;">Average rating: </span><span id="wineMatch-rating-searchTab">0.9</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Rating count: </span><span id="wineMatch-ratingCount-searchTab">42</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Score: </span><span id="wineMatch-score-searchTab">0.67</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Price: </span><span id="wineMatch-price-searchTab">$32.21</span></li>
+                                        <li class="list-group-item">
+                                          <span style="font-weight: 600;">Description: </span>
+                                          <span id="wineMatch-description-searchTab"
+                                            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque eos asperiores vel ipsum fuga voluptatum obcaecati qui reprehenderit unde impedit ex, quo ullam minima minus quam accusantium? Voluptates,
+                                            repellat veritatis.</span
+                                          >
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="v-pills-mealPlan" role="tabpanel" aria-labelledby="v-pills-mealPlan-tab">
+                  <div class="row" id="mealPlan-main-container">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding-bottom: 15px !important;">
+                      <div class="card mt-3 shadow-sm">
+                        <h5 class="card-header">Generate your own meal plan</h5>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-lg-6 mb-4">
+                              <label for="time-frame" style="font-weight: 500;">Time frame:</label>
+                              <select class="custom-select ml-2" id="time-frame" style="width: 60%;">
+                                <option value="day">Day</option>
+                                <option value="week">Week</option>
+                              </select>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                              <label for="calories-target" style="font-weight: 500;">Calories target:</label>
+                              <input type="number" class="form-control ml-2" style="width: 60%; display: inline-block;" id="calories-target" data-toggle="tooltip" data-placement="top" title="What is the caloric target for one day? The meal plan generator will try to get as close as possible to that goal.">
+                            </div>
+                            <div class="col-lg-6">
+                              <label for="diet-mealPlan" style="font-weight: 500;">Diet filter:</label fo>
+                                <select id="diet-mealPlan" class="custom-select" style="width: 60%; margin-left: 22px !important;" data-toggle="tooltip" data-placement="top" title="Choose a diet that the meal plan has to adhere to.">
+                                  <option value="null">None</option>
+                                  <option value="gluten-free">Gluten Free</option>
+                                  <option value="ketogenic">Ketogenic</option>
+                                  <option value="vegeterian">Vegeterian</option>
+                                  <option value="lacto-vegeterian">Lacto - Vegeterian</option>
+                                  <option value="ovo-vegeterian">Ovo - Vegeterian</option>
+                                  <option value="vegan">Vegan</option>
+                                  <option value="pesceterian">Pesceterian</option>
+                                  <option value="paleo">Paleo</option>
+                                  <option value="primal">Primal</option>
+                                  <option value="whole30">Whole 30</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-6">
+                              <label for="exclude-mealPlan" style="font-weight: 500;">Don't include:</label>
+                              <input type="text" data-toggle="tooltip" data-placement="top" title="A comma-separated list of allergens or ingredients that must be excluded." class="form-control" style="width: 60%; display: inline-block; margin-left: 17px !important;" id="exclude-mealPlan">
+                            </div>
+                          </div>
+                          <div class="row mt-4">
+                            <div class="col-lg-4"></div>
+                            <div class="col-lg-4">
+                              <button class="btn btn-warning btn-block" onclick="generateMealPlan(this);"><i class="fas fa-paper-plane mr-2"></i>Submit</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row mt-4">
+                        <div class="col-lg-12">
+                          <div class="card shadow-sm" style="display: none;" id="oneDay-mealPlan">
+                            <h5 class="card-header bg-warning text-white text-center">
+                              One day meal plan
+                            </h5>
+                            <div class="card-body" style="padding: 10px !important;">
+                              <div class="row" id="oneDay-mealPlan-row">
+                                <div class="col-lg-4">
+                                  <div class="card text-center">
+                                    <img src="http://placehold.it/300x150" class="card-img-top" alt="...">
+                                    <div class="card-body" style="padding: 10px !important;">
+                                      <h5 class="card-title">Breakfast</h5>
+                                      <p class="card-text">Some quick example text to build on the card</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="row mt-3">
+                                <div class="col-lg-12">
+                                  <div class="alert alert-success" role="alert" style="margin-bottom: 0px !important;" id="oneDay-nutritionInfo">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card-footer text-center">
+                              <span class="text-muted align-middle"><b>NOTE:</b> If you don't like this meal plan you can always generate a new one.</span>
+                              <button class="btn btn-success btn-sm float-right" id="saveMealPlanDaily--btn" onclick="saveMealPlan(this)"><i class="fas fa-cloud-download-alt mr-2"></i>Save</button>
+                            </div>
+                          </div>
+                          <div class="card shadow-sm" id="entireWeek-mealPlan" style="display: none;">
+                            <h5 class="card-header bg-warning text-white text-center">
+                              Entire week meal plan
+                            </h5>
+                            <div class="card-body" style="padding: 10px !important;">
+                              <div class="row">
+                                <div class="col-2">
+                                  <div class="list-group" id="list-tab" role="tablist">
+                                    <a class="list-group-item list-group-item-action active" id="list-monday-list" data-toggle="list" href="#list-monday" role="tab" aria-controls="monday" style="padding: 10px 20px !important;">Monday</a>
+                                    <a class="list-group-item list-group-item-action" id="list-tuesday-list" data-toggle="list" href="#list-tuesday" role="tab" aria-controls="tuesday" style="padding: 10px 20px !important;">Tuesday</a>
+                                    <a class="list-group-item list-group-item-action text-center" id="list-wednesday-list" data-toggle="list" href="#list-wednesday" role="tab" aria-controls="wednesday" style="padding: 10px !important;">Wednesday</a>
+                                    <a class="list-group-item list-group-item-action" id="list-thursday-list" data-toggle="list" href="#list-thursday" role="tab" aria-controls="thursday" style="padding: 10px 20px !important;">Thursday</a>
+                                    <a class="list-group-item list-group-item-action" id="list-friday-list" data-toggle="list" href="#list-friday" role="tab" aria-controls="friday" style="padding: 10px 20px !important;">Friday</a>
+                                    <a class="list-group-item list-group-item-action" id="list-saturday-list" data-toggle="list" href="#list-saturday" role="tab" aria-controls="saturday" style="padding: 10px 20px !important;">Saturday</a>
+                                    <a class="list-group-item list-group-item-action" id="list-sunday-list" data-toggle="list" href="#list-sunday" role="tab" aria-controls="sunday" style="padding: 10px 20px !important;">Sunday</a>
+                                  </div>
+                                </div>
+                                <div class="col-10">
+                                  <div class="tab-content" id="tab-content-containers">
+                                    <div class="tab-pane fade show active" id="list-monday" role="tabpanel" aria-labelledby="list-monday-list">monday</div>
+                                    <div class="tab-pane fade" id="list-tuesday" role="tabpanel" aria-labelledby="list-tuesday-list">
+                                    </div>
+                                    <div class="tab-pane fade" id="list-wednesday" role="tabpanel" aria-labelledby="list-wednesday-list">wednesday</div>
+                                    <div class="tab-pane fade" id="list-thursday" role="tabpanel" aria-labelledby="list-thursday-list">thursday</div>
+                                    <div class="tab-pane fade" id="list-friday" role="tabpanel" aria-labelledby="list-friday-list">friday</div>
+                                    <div class="tab-pane fade" id="list-saturday" role="tabpanel" aria-labelledby="list-saturday-list">saturday</div>
+                                    <div class="tab-pane fade" id="list-sunday" role="tabpanel" aria-labelledby="list-sunday-list">sunday</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card-footer text-muted text-center">
+                              <span class="text-muted align-middle"><b>NOTE:</b> If you don't like this meal plan you can always generate a new one.</span>
+                              <button class="btn btn-success btn-sm float-right" id="saveMealPlanWeekly--btn" onclick="saveMealPlan(this)"><i class="fas fa-cloud-download-alt mr-2"></i>Save</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row" id="recipeInfo-tab-mealPlanTab" style="display: none; margin-bottom: 150px !important;">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding-bottom: 15px !important;">
+                      <p style="margin-bottom: 0px !important; margin-top: 8px !important;"><i class="fas fa-arrow-left" style="color: #b3b3b3;" onclick="goBackToMealPlan();" data-toggle="tooltip" data-placement="top" title="Go Back To Meal Plan"></i></p>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <h1 class="text-center mb-4" id="recipeInfo--title-mealPlanTab"></h1>
+                        </div>
+                        <div class="col-lg-5">
+                          <img src="" alt="" width="100%" style="object-fit: cover;" id="recipeInfo--image-mealPlanTab" class="rounded shadow-sm" />
+                        </div>
+                        <div class="col-lg-4" style="margin-bottom: 0px !important;"><div class="p--modified alert alert-warning" role="alert" id="recipeInfo--middleTab-mealPlanTab"></div></div>
+                        <div class="col-lg-3" style="padding: 10px 40px;" id="recipeInfo--dietTab-mealPlanTab"></div>
+                      </div>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <div class="card shadow-sm">
+                            <div class="card-body">
+                              <h5 class="card-title">Recipe description</h5>
+                              <p class="card-text" id="recipe-summary-mealPlanTab"></p>
+                              <div id="recipe-summary-buttons-mealPlanTab"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <nav>
+                            <div class="nav nav-tabs" id="nav-tab-mealPlanTab" role="tablist">
+                              <a class="nav-item nav-link active" id="nav-ingredients-tab-mealPlanTab" data-toggle="tab" href="#nav-ingredients-mealPlanTab" role="tab" aria-controls="nav-ingredients" aria-selected="true">Ingredients</a>
+                              <a class="nav-item nav-link" id="nav-instructions-tab-mealPlanTab" data-toggle="tab" href="#nav-instructions-mealPlanTab" role="tab" aria-controls="nav-instructions" aria-selected="false">Instructions</a>
+                              <a class="nav-item nav-link" id="nav-nutrition-tab-mealPlanTab" data-toggle="tab" href="#nav-nutrition-mealPlanTab" role="tab" aria-controls="nav-nutrition" aria-selected="false">Recipe nutrition</a>
+                              <a class="nav-item nav-link" id="nav-pairing-tab-mealPlanTab" data-toggle="tab" href="#nav-pairing-mealPlanTab" role="tab" aria-controls="nav-pairing" aria-selected="false" style="display: none;">Wine pairing</a>
+                            </div>
+                          </nav>
+                          <div class="tab-content" id="nav-tabContent-mealPlanTab">
+                            <div class="tab-pane fade show active" id="nav-ingredients-mealPlanTab" role="tabpanel" aria-labelledby="nav-ingredients-tab">
+                              <h4>Necessary ingredients:</h4>
+                              <div class="row" id="ingredients-row-mealPlanTab"></div>
+                              <h4 class="mb-3" id="equip-title-mealPlanTab">Necessary equipment:</h4>
+                              <div class="row" id="equipment-row-mealPlanTab"></div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-instructions-mealPlanTab" role="tabpanel" aria-labelledby="nav-instructions-tab">
+                              <h4 class="mb-3">Step by step:</h4>
+                              <div id="instructions-mealPlanTab" class="list-group"></div>
+                            </div>
+                            <div class="tab-pane fade" style="padding: 0px 20px 20px 20px" id="nav-nutrition-mealPlanTab" role="tabpanel" aria-labelledby="nav-nutrition-tab">
+                              <div class="row">
+                                <div class="col-lg-12" id="nutrition-widget-mealPlanTab"></div>
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-pairing-mealPlanTab" role="tabpanel" aria-labelledby="nav-pairing-tab">
+                              <div class="card mb-4">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">
+                                  Wine tips
+                                </h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wine-types-mealPlanTab"></h5>
+                                  <p class="card-text" id="wine-text-mealPlanTab"></p>
+                                </div>
+                              </div>
+                              <div class="card" id="productMatches-card-mealPlanTab" style="display: none;">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">Matched product</h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wineMatch-title-mealPlanTab">Malbec Reserve</h5>
+                                  <div class="row">
+                                    <div class="col-lg-3">
+                                      <img src="http://placehold.it/200x350" id="wineMatch-image-mealPlanTab" width="100%" style="object-fit: cover; margin-top: 20px;" alt="" />
+                                    </div>
+                                    <div class="col-lg-9">
+                                      <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><span style="font-weight: 600;">Average rating: </span><span id="wineMatch-rating-mealPlanTab">0.9</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Rating count: </span><span id="wineMatch-ratingCount-mealPlanTab">42</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Score: </span><span id="wineMatch-score-mealPlanTab">0.67</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Price: </span><span id="wineMatch-price-mealPlanTab">$32.21</span></li>
+                                        <li class="list-group-item">
+                                          <span style="font-weight: 600;">Description: </span>
+                                          <span id="wineMatch-description-mealPlanTab"
+                                            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque eos asperiores vel ipsum fuga voluptatum obcaecati qui reprehenderit unde impedit ex, quo ullam minima minus quam accusantium? Voluptates,
+                                            repellat veritatis.</span
+                                          >
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2" style="padding: 20px 10px !important">
+          <div class="card text-white bg-secondary mb-3" id="history-card" style="display: none;">
+            <div class="card-header text-center">VIEW HISTORY :</div>
+            <div class="card-body" style="padding: 10px !important;">
+              <ul style="padding-left: 15px !important; margin-bottom: 0px !important;" id="history-list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script type="text/javascript" src="canvasjs.min.js"></script>
+    <script src="./popover/jquery-popover-0.0.3.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,204 @@
+body {
+  color: #4d4d4d;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #33cc33;
+}
+
+.nav-pills a {
+  color: #4d4d4d;
+}
+
+.nav-pills a:hover {
+  border-radius: 0.25rem;
+  background-color: #e0e0d1;
+  border-left: 5px solid #33cc33;
+  padding-left: 11px !important;
+}
+
+.nav-pills .nav-link.active:hover {
+  border: 0;
+  padding-left: 16px !important;
+}
+
+.alert-modified {
+  padding: 0px 5px !important;
+}
+
+.recipe-card p {
+  margin-bottom: 5px !important;
+}
+
+.recipe-card {
+  padding: 15px 15px 5px 15px !important;
+}
+
+.badge-warning {
+  color: #333333;
+  background-color: #ffff4d;
+}
+
+.diet-icon:hover {
+  cursor: pointer;
+}
+
+.card--hover:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.65) !important;
+}
+
+.recipe-card p:hover {
+  cursor: default;
+}
+
+.fa-arrow-left:hover {
+  cursor: pointer;
+}
+
+.p--modified p {
+  margin-bottom: 8px !important;
+}
+
+.p--modified {
+  padding: 10px 20px;
+}
+
+#nav-ingredients,
+#nav-instructions,
+#nav-nutrition,
+#nav-pairing {
+  padding: 20px;
+  border: 1px solid transparent;
+  border-color: #f2f2f2 #dee2e6 #dee2e6 #dee2e6;
+  border-top-width: 0px;
+}
+
+#nav-ingredients-searchTab,
+#nav-instructions-searchTab,
+#nav-nutrition-searchTab,
+#nav-pairing-searchTab {
+  padding: 20px;
+  border: 1px solid transparent;
+  border-color: #f2f2f2 #dee2e6 #dee2e6 #dee2e6;
+  border-top-width: 0px;
+}
+
+#nav-ingredients-mealPlanTab,
+#nav-instructions-mealPlanTab,
+#nav-nutrition-mealPlanTab,
+#nav-pairing-mealPlanTab {
+  padding: 20px;
+  border: 1px solid transparent;
+  border-color: #f2f2f2 #dee2e6 #dee2e6 #dee2e6;
+  border-top-width: 0px;
+}
+
+.list-group-flush:last-child .list-group-item:last-child {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.nav-tabs a {
+  color: #4d4d4d;
+}
+
+.nav-tabs .nav-link.active {
+  color: black;
+  background-color: #f9ffe6;
+  border-color: #33cc33 #dee2e6 #f9ffe6;
+  border-top-width: 4px;
+}
+
+#nav-tabContent {
+  background-color: #f9ffe6;
+}
+
+#nav-tabContent-searchTab {
+  background-color: #f9ffe6;
+}
+
+#nav-tabContent-mealPlanTab {
+  background-color: #f9ffe6;
+}
+
+.popover-modal .popover-body {
+  overflow: unset;
+  padding: 5px;
+  max-height: none;
+}
+
+.popover-modal {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.775);
+  width: 250px;
+  border: 0px !important;
+}
+
+.popover-header {
+  background-color: white;
+}
+
+.popover-body {
+  background-color: #f7f7f7;
+}
+
+.img-hover:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.popover-modal:before {
+  border: 0px !important;
+}
+
+.recipe-history-item:hover {
+  cursor: pointer;
+  color: #33ffd6;
+}
+
+.intolerance-dropdown {
+  transform: unset !important;
+  top: unset !important;
+  width: 100%;
+  max-height: 370px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.dropdown-item:hover {
+  cursor: pointer;
+}
+
+.custom-control {
+  padding-left: 35px !important;
+}
+
+.form-control[readonly] {
+  background-color: #fff;
+}
+
+.fa-times-circle:hover {
+  cursor: pointer;
+}
+
+.nutrients-row:hover {
+  cursor: pointer;
+  background-color: aliceblue;
+}
+
+.custom-control-input:hover,
+.custom-control-label:hover {
+  cursor: pointer;
+}
+
+.search-results-hover:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+  background-color: #fff;
+}
+
+.list-group-item.active {
+  z-index: 2;
+  color: #fff;
+  background-color: #5cd65c;
+  border-color: #5cd65c;
+}

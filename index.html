@@ -10,23 +10,6 @@
     <script src="https://kit.fontawesome.com/d4b741b49f.js" crossorigin="anonymous"></script>
   </head>
   <body onload="initApp();">
-    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-success">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-        </ul>
-      </div>
-    </nav> -->
     <div class="container-fluid">
       <div class="row">
         <div class="col-lg-10" style="padding: 20px !important">
@@ -36,6 +19,10 @@
                 <a class="nav-link active" id="v-pills-popular_recipes-tab" data-toggle="pill" href="#v-pills-popular_recipes" role="tab" aria-controls="v-pills-home" aria-selected="true" onclick="displayRandomRecipesTab();">Popular recipes</a>
                 <a class="nav-link" id="v-pills-recipe_search-tab" data-toggle="pill" href="#v-pills-recipe_search" role="tab" aria-controls="v-pills-profile" aria-selected="false" onclick="displaySearchTab();">Recipe search</a>
                 <a class="nav-link" id="v-pills-mealPlan-tab" data-toggle="pill" href="#v-pills-mealPlan" role="tab" aria-controls="v-pills-mealPlan" aria-selected="false" onclick="goBackToMealPlan();">Meal plan</a>
+                <a class="nav-link" id="v-pills-wines-tab" data-toggle="pill" href="#v-pills-wines" role="tab" aria-controls="v-pills-wines" aria-selected="false" onclick="displayWinesTab();">Wine cellar</a>
+                <a class="nav-link" id="v-pills-chatbot-tab" data-toggle="pill" href="#v-pills-chatbot" role="tab" aria-controls="v-pills-chatbot" aria-selected="false" onclick="displayChatbotTab();">Food conversation</a>
+                <a class="nav-link" id="v-pills-favRecipes-tab" data-toggle="pill" href="#v-pills-favRecipes" role="tab" aria-controls="v-pills-favRecipes" aria-selected="false" onclick="createFavouriteRecipesTab();">My favourite recipes<span class="badge badge-warning ml-2" id="favRecipes-badge">1</span></a>
+                <a class="nav-link" id="v-pills-shoppingList-tab" data-toggle="pill" onclick="createShoppingListTab();" href="#v-pills-shoppingList" role="tab" aria-controls="v-pills-shoppingList" aria-selected="false">My shopping list<span class="badge badge-warning ml-2" id="shopList-badge">1</span></a>
               </div>
             </div>
             <div class="col-9">
@@ -704,6 +691,209 @@
                     </div>
                   </div>
                 </div>
+                <div class="tab-pane fade" id="v-pills-chatbot" role="tabpanel" aria-labelledby="v-pills-chatbot-tab">
+                  <div class="row">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding: 0px 15px 15px 30px !important; background-color: #e6e6e6;">
+                      <div class="row">
+                        <div class="col-lg-2" style="padding: 30px 15px !important;">
+                          <img src="./avatars/female.png" style="border-radius: 50%;" width="200px" height="200px" alt="" id="chatbot-img">
+                        </div>
+                        <div class="col-lg-5" style="margin-left: 15px; padding: 50px 15px !important;">
+                          <div class="word-cloud right">
+                            <div class="content">
+                              <p id="welcome-text" style="margin-bottom: 0px !important;"></p>
+                              <p style="margin-bottom: 0px !important; margin-top: 5px; font-weight: 500;" id="welcome-back-text"></p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-4" style="padding: 45px 15px !important; display: none;" id="conversation-suggestions-col">
+                          <label style="color: black;" for="conversation-subject">Say something to <span id="chatbot-name"></span>:</label>
+                          <div class="dropdown">
+                            <textarea rows="2" style="resize: none;" onkeyup="getConversationSuggestions(this.value);" class="form-control" id="conversation-subject" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onfocus="hideSuggestionsDropdown(this.value);" onkeyup="getConversationSuggestions(this.value);"></textarea>
+                            <div class="dropdown-menu" id="suggestions-dropdown" aria-labelledby="dropdownMenuLink">
+                              <div class="list-group" id="suggestions-list">
+                              </div>
+                            </div>
+                          </div>  
+                          <p style="margin: 5px 0px !important;"><button id="ask--btn" class="btn btn-success btn-sm btn-block" onclick="talkToChatbot();" disabled>Ask question</button></p>
+                          <p style="margin-bottom: 0px !important;"><button id="empty-field--btn" class="btn btn-danger btn-sm btn-block" onclick="emptyQuestionInput();" disabled>Empty field</button></p>
+                        </div>
+                      </div>
+                      <div class="row mt-5">
+                        <div class="col-lg-12" id="answers-list">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="v-pills-wines" role="tabpanel" aria-labelledby="v-pills-wines-tab">
+                  <div class="row">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding: 0px !important;">
+                      <img src="wine-cellar.jpg" width="100%" style="border-radius: .25rem .25rem 0px 0px; max-height: 350px; object-fit: cover;" alt="">
+                      <div class="row" style="padding: 20px !important; margin: 0px !important; background-color: #e1e1d0;border: 1px solid rgba(0,0,0,.125); border-radius: 0 0 .25rem .25rem; border-top-width: 0px;">
+                        <div class="col-lg-4">
+                          <select class="custom-select shadow-sm" onchange="changeWineFilters(this.value);">
+                            <option value="dish-pairing" selected>Dish pairing for wine</option>
+                            <option value="wine-pairing">Wine pairing</option>
+                            <option value="wine-description">Wine description</option>
+                            <option value="wine-recommendation">Wine recommendation</option>
+                          </select>
+                        </div>
+                        <div class="col-lg-8" style="padding-left: 40px;">
+                          <div id="dish-pairing-inputTab" class="wine-inputs">
+                            <input type="text" onkeyup="enableBtn('dish-pairing-submitBtn', this.value);" id="dish-pairing-input" class="form-control mr-5 shadow-sm" style="width: 60%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The type of wine that should be paired, e.g. "merlot", "riesling", or "malbec".' placeholder="Type some wine here...">
+                            <button class="btn btn-danger mb-1 float-right" id="dish-pairing-submitBtn" onclick="getWinesHandler('dish-pairing', this);" disabled><i class="fas fa-paper-plane mr-2"></i>Submit</button>
+                          </div>
+                          <div id="wine-pairing-inputTab" class="wine-inputs" style="display: none;">
+                            <input type="text" onkeyup="enableBtn('wine-pairing-submitBtn', this.value);" id="wine-pairing-input" class="form-control mr-3 shadow-sm" style="width: 60%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The food to get a pairing for. This can be a dish ("steak") or an ingredient ("salmon").' placeholder="Type some food here...">
+                            <input type="number" id="wine-pairing-input-maxPrice" class="form-control shadow-sm float-right" style="width: 25%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The maximum price for the specific wine recommendation in USD.' placeholder="Max price">
+                            <p><button class="btn btn-danger float-right mt-3" onclick="getWinesHandler('wine-pairing', this);" id="wine-pairing-submitBtn" disabled><i class="fas fa-paper-plane mr-2"></i>Submit</button></p>
+                          </div>
+                          <div id="wine-description-inputTab" class="wine-inputs" style="display: none;">
+                            <input type="text" onkeyup="enableBtn('wine-description-submitBtn', this.value);" id="wine-description-input" class="form-control shadow-sm mr-5" style="width: 60%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The name of the wine that should be paired, e.g. "merlot", "riesling", or "malbec".' placeholder="Type some wine here...">
+                            <button class="btn btn-danger mb-1 float-right" onclick="getWinesHandler('wine-description', this);" id="wine-description-submitBtn" disabled><i class="fas fa-paper-plane mr-2"></i>Submit</button>
+                          </div>
+                          <div id="wine-recommendation-inputTab" class="wine-inputs" style="display: none;">
+                            <input type="text" id="wine-recommendation-input" onkeyup="enableBtn('wine-recommendation-submitBtn', this.value);" class="form-control shadow-sm mr-2" style="width: 50%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The type of wine to get a specific product recommendation for.' placeholder="Type some wine here...">
+                            <input type="number" id="wine-recommendation-input-maxPrice" class="form-control shadow-sm float-right" style="width: 22%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The maximum price for the specific wine recommendation in USD.' placeholder="Max price">
+                            <input type="number" id="wine-recommendation-input-minRating" min="0" max="1" step="0.1" class="form-control shadow-sm float-right mr-3" style="width: 22%; display: inline-block;" data-toggle="tooltip" data-placement="top" title='The minimum rating of the recommended wine between 0 and 1. For example, 0.8 equals 4 out of 5 stars.' placeholder="Min rating">
+                            <p><button class="btn btn-danger float-right mt-3" onclick="getWinesHandler('wine-recommendation', this);" id="wine-recommendation-submitBtn" disabled><i class="fas fa-paper-plane mr-2"></i>Submit</button></p>
+                          </div>
+                        </div>
+                          <div class="col-lg-12 mt-5" id="wine-results-row">
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="v-pills-favRecipes" role="tabpanel" aria-labelledby="v-pills-favRecipes">
+                  <div class="row" id="favouritesTab-main-container">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding: 20px !important; background-color: #e6e6e6;">
+                      <h4 class="text-center" id="no-recipes-title">You don't have any favourite recipes yet.</h4>
+                      <div class="row" id="favRecipes-mainRow"></div>
+                    </div>
+                  </div>
+                  <div class="row" id="recipeInfo-tab-favouritesTab" style="display: none; margin-bottom: 150px !important;">
+                    <div class="col-lg-12 shadow" style="border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; padding-bottom: 15px !important;">
+                      <p style="margin-bottom: 0px !important; margin-top: 8px !important;"><i class="fas fa-arrow-left" style="color: #b3b3b3;" onclick="goBackToFavourites();" data-toggle="tooltip" data-placement="top" title="Go Back To Favourites"></i></p>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <h1 class="text-center mb-4" id="recipeInfo--title-favouritesTab"></h1>
+                        </div>
+                        <div class="col-lg-5">
+                          <img src="" alt="" width="100%" style="object-fit: cover;" id="recipeInfo--image-favouritesTab" class="rounded shadow-sm" />
+                        </div>
+                        <div class="col-lg-4" style="margin-bottom: 0px !important;"><div class="p--modified alert alert-warning" role="alert" id="recipeInfo--middleTab-favouritesTab"></div></div>
+                        <div class="col-lg-3" style="padding: 10px 40px;" id="recipeInfo--dietTab-favouritesTab"></div>
+                      </div>
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <div class="card shadow-sm">
+                            <div class="card-body">
+                              <h5 class="card-title">Recipe description</h5>
+                              <p class="card-text" id="recipe-summary-favouritesTab"></p>
+                              <div id="recipe-summary-buttons-favouritesTab"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <nav>
+                            <div class="nav nav-tabs" id="nav-tab-favouritesTab" role="tablist">
+                              <a class="nav-item nav-link active" id="nav-ingredients-tab-favouritesTab" data-toggle="tab" href="#nav-ingredients-favouritesTab" role="tab" aria-controls="nav-ingredients" aria-selected="true">Ingredients</a>
+                              <a class="nav-item nav-link" id="nav-instructions-tab-favouritesTab" data-toggle="tab" href="#nav-instructions-favouritesTab" role="tab" aria-controls="nav-instructions" aria-selected="false">Instructions</a>
+                              <a class="nav-item nav-link" id="nav-nutrition-tab-favouritesTab" data-toggle="tab" href="#nav-nutrition-favouritesTab" role="tab" aria-controls="nav-nutrition" aria-selected="false">Recipe nutrition</a>
+                              <a class="nav-item nav-link" id="nav-pairing-tab-favouritesTab" data-toggle="tab" href="#nav-pairing-favouritesTab" role="tab" aria-controls="nav-pairing" aria-selected="false" style="display: none;">Wine pairing</a>
+                            </div>
+                          </nav>
+                          <div class="tab-content" id="nav-tabContent-favouritesTab">
+                            <div class="tab-pane fade show active" id="nav-ingredients-favouritesTab" role="tabpanel" aria-labelledby="nav-ingredients-tab">
+                              <h4>Necessary ingredients:</h4>
+                              <div class="row" id="ingredients-row-favouritesTab"></div>
+                              <h4 class="mb-3" id="equip-title-favouritesTab">Necessary equipment:</h4>
+                              <div class="row" id="equipment-row-favouritesTab"></div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-instructions-favouritesTab" role="tabpanel" aria-labelledby="nav-instructions-tab">
+                              <h4 class="mb-3">Step by step:</h4>
+                              <div id="instructions-favouritesTab" class="list-group"></div>
+                            </div>
+                            <div class="tab-pane fade" style="padding: 0px 20px 20px 20px" id="nav-nutrition-favouritesTab" role="tabpanel" aria-labelledby="nav-nutrition-tab">
+                              <div class="row">
+                                <div class="col-lg-12" id="nutrition-widget-favouritesTab"></div>
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="nav-pairing-favouritesTab" role="tabpanel" aria-labelledby="nav-pairing-tab">
+                              <div class="card mb-4">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">
+                                  Wine tips
+                                </h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wine-types-favouritesTab"></h5>
+                                  <p class="card-text" id="wine-text-favouritesTab"></p>
+                                </div>
+                              </div>
+                              <div class="card" id="productMatches-card-favouritesTab" style="display: none;">
+                                <h6 class="card-header bg-warning" style="border-bottom: 0px !important;">Matched product</h6>
+                                <div class="card-body">
+                                  <h5 class="card-title" id="wineMatch-title-favouritesTab">Malbec Reserve</h5>
+                                  <div class="row">
+                                    <div class="col-lg-3">
+                                      <img src="http://placehold.it/200x350" id="wineMatch-image-favouritesTab" width="100%" style="object-fit: cover; margin-top: 20px;" alt="" />
+                                    </div>
+                                    <div class="col-lg-9">
+                                      <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><span style="font-weight: 600;">Average rating: </span><span id="wineMatch-rating-favouritesTab">0.9</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Rating count: </span><span id="wineMatch-ratingCount-favouritesTab">42</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Score: </span><span id="wineMatch-score-favouritesTab">0.67</span></li>
+                                        <li class="list-group-item"><span style="font-weight: 600;">Price: </span><span id="wineMatch-price-favouritesTab">$32.21</span></li>
+                                        <li class="list-group-item">
+                                          <span style="font-weight: 600;">Description: </span>
+                                          <span id="wineMatch-description-favouritesTab"
+                                            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque eos asperiores vel ipsum fuga voluptatum obcaecati qui reprehenderit unde impedit ex, quo ullam minima minus quam accusantium? Voluptates,
+                                            repellat veritatis.</span
+                                          >
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="v-pills-shoppingList" role="tabpanel" aria-labelledby="v-pills-shoppingList">
+                  <div class="row">
+                    <div class="col-lg-12" style="padding: 20px !important;">
+                      <h4 class="text-center" id="no-list-title">Your shopping list is currently empty.</h4>
+                      <div class="row">
+                        <div class="col-lg-6" id="groceries-list-container" style="display: none;">
+                          <div class="card shadow" style="background-color: #eaeae1;">
+                            <div class="card-body">
+                              <h5 class="card-title">Groceries:</h5>
+                              <ul class="list-group list-group-flush" id="groceries-list-group">
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6" id="wines-list-container" style="display: none;">
+                          <div class="card shadow" style="background-color: #eaeae1;">
+                            <div class="card-body">
+                              <h5 class="card-title">Wines:</h5>
+                              <div class="list-group" id="wines-list-group">
+                                <button type="button" class="list-group-item list-group-item-action">Dapibus ac facilisis in</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -719,6 +909,44 @@
       </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="myModalTitle">Wine details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" style="height: 300px;">
+            <div class="row" id="spinner-modal">
+              <div class="col-lg-12">
+                <div class="d-flex justify-content-center" style="margin-top: 100px;">
+                  <div class="spinner-border text-danger" role="status" style="width: 5rem; height: 5rem;">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" id="main-row-modal" style="display: none;">
+              <div class="col-lg-4">
+                <img src="" alt="" id="wine-img-modal" width="100%" height="267px" style="object-fit: cover;">
+              </div>
+              <div class="col-lg-8">
+                <h4 id="wine-title-modal"></h4>
+                <p><span style="font-weight: 500;">Description: </span><span id="wine-description-modal"></span></p>
+                <p><span style="font-weight: 500;">Price: </span><span id="wine-price-modal"></span>$</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" id="remove-btn-modal">Remove from the list</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>

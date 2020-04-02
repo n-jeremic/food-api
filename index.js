@@ -1,6 +1,7 @@
-// const apiKey = "791d9715b9454e049e21c5c9b46ca8df";
-const apiKey = "1fa9fd007ea14a9db14691c266865645";
+const apiKey = "791d9715b9454e049e21c5c9b46ca8df";
+// const apiKey = "1fa9fd007ea14a9db14691c266865645";
 let searchResultsGlobal;
+let chatbotDisplayed = false;
 
 $(function() {
   $('[data-toggle="tooltip"]').tooltip();
@@ -11,8 +12,111 @@ String.prototype.capitalize = function() {
 };
 
 async function initApp() {
+  createShoppingListTab();
+  createFavouriteRecipesTab();
   await getRandomRecipes();
   createHistoryList(true, "historyTab");
+}
+
+function displayRemoveBtn(ingredient_id) {
+  $(`#remove-ingredient-btn-${ingredient_id}`).css("visibility", "visible");
+}
+
+function hideRemoveBtn(ingredient_id) {
+  $(`#remove-ingredient-btn-${ingredient_id}`).css("visibility", "hidden");
+}
+
+function createShoppingListTab() {
+  const listLS = localStorage.getItem("shoppingList");
+  if (listLS) {
+    let number = 0;
+    const listObj = JSON.parse(listLS);
+    if (listObj.ingredients !== undefined && listObj.ingredients.length > 0) {
+      number += listObj.ingredients.length;
+      let ingredientsList = "";
+      listObj.ingredients.forEach(ingredient => {
+        ingredientsList += `<li class="list-group-item list-group-item-action groceries-list-hover" style="background-color: #eaeae1;" onmouseover="displayRemoveBtn(${ingredient.id});" onmouseleave="hideRemoveBtn(${
+          ingredient.id
+        });"><img width="50px" class="mr-3 shadow-sm rounded" height="50px" src="https://spoonacular.com/cdn/ingredients_250x250/${ingredient.image}">${ingredient.name.capitalize()}<button type="button" id="remove-ingredient-btn-${
+          ingredient.id
+        }" class="close float-right" style="margin-top: 11px; visibility: hidden;" aria-label="Close" onclick="removeFromShoppingList(${ingredient.id}, 'ingredients')">
+        <span aria-hidden="true">&times;</span>
+        </button></li>`;
+      });
+
+      $("#groceries-list-group").empty();
+      $("#groceries-list-group").append(ingredientsList);
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#groceries-list-container").css("display", "block");
+    } else {
+      $("#groceries-list-container").css("display", "none");
+    }
+
+    if (listObj.wines !== undefined && listObj.wines.length > 0) {
+      number += listObj.wines.length;
+      let winesList = "";
+      listObj.wines.forEach(wine => {
+        winesList += `<button type="button" data-toggle="modal" data-target="#myModal" data-toggle="tooltip" data-placement="top" title="Click for more details" class="list-group-item list-group-item-action" onclick="getWineDetailsModal(${wine.id})">${wine.title}</button>`;
+      });
+
+      $("#wines-list-group").empty();
+      $("#wines-list-group").append(winesList);
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#wines-list-container").css("display", "block");
+    } else {
+      $("#wines-list-container").css("display", "none");
+    }
+
+    $("#shopList-badge").text(number);
+
+    if (number > 0) {
+      $("#no-list-title").css("display", "none");
+    } else {
+      $("#groceries-list-container").css("display", "none");
+      $("#wines-list-container").css("display", "none");
+      $("#no-list-title").css("display", "block");
+    }
+  } else {
+    $("#groceries-list-container").css("display", "none");
+    $("#wines-list-container").css("display", "none");
+    $("#shopList-badge").text("0");
+    $("#no-list-title").css("display", "block");
+  }
+
+  $("#history-card").css("display", "none");
+}
+
+function createFavouriteRecipesTab() {
+  const recipesJSON = localStorage.getItem("favouriteRecipes");
+  if (recipesJSON) {
+    const recipesArr = JSON.parse(recipesJSON);
+    if (recipesArr.length > 0) {
+      $("#no-recipes-title").css("display", "none");
+      let cardsMarkup = "";
+      recipesArr.forEach(recipe => {
+        cardsMarkup += `<div class="col-lg-6 mb-4"><div class="card shadow-sm" style="border: none">
+        <img src="${recipe.image}" class="card-img-top" alt="${recipe.title}-img">
+        <div class="card-body" style="padding: 10px !important; border: 1px solid rgba(0,0,0,.125); border-radius: 0 0 .25rem .25rem; border-top: none;">
+          <h5 class="card-title text-center mb-4">${recipe.title}</h5>
+          <button class="btn btn-danger btn-sm float-right ml-3" onclick="removeFavouriteRecipe(${recipe.id});"><i class="far fa-trash-alt mr-1"></i>Remove</button>
+          <button class="btn btn-warning btn-sm float-right" onclick="getRecipeInfo(${recipe.id}, this, 'favouritesTab')"><i class="fas fa-info-circle mr-1"></i>More info</button>
+        </div>
+      </div></div>`;
+      });
+
+      $("#favRecipes-mainRow").empty();
+      $("#favRecipes-mainRow").append(cardsMarkup);
+    } else {
+      $("#favRecipes-mainRow").empty();
+      $("#no-recipes-title").css("display", "block");
+    }
+
+    $("#favRecipes-badge").text(recipesArr.length);
+  } else {
+    $("#favRecipes-badge").text("0");
+  }
+
+  $("#history-card").css("display", "none");
 }
 
 async function getRandomRecipes() {
@@ -58,49 +162,49 @@ function createDietIcons(recipeObj, recipeInfoTab = false) {
   let recipeInfoData = "";
   if (recipeObj.vegetarian) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #ff9900; margin: 7px; border: 2px solid #ff9900; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Vegetarian'><i class='fas fa-carrot'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #ff9900; margin: 5px; border: 2px solid #ff9900; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Vegetarian'><i class='fas fa-carrot'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Vegetarian</p>';
   }
 
   if (recipeObj.vegan) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #00cc00; margin: 7px; border: 2px solid #00cc00; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Vegan'><i class='fas fa-leaf'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #00cc00; margin: 5px; border: 2px solid #00cc00; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Vegan'><i class='fas fa-leaf'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Vegan</p>';
   }
 
   if (recipeObj.glutenFree) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #6699ff; margin: 7px; border: 2px solid #6699ff; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Gluten Free'><i class='fas fa-seedling'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #6699ff; margin: 5px; border: 2px solid #6699ff; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Gluten Free'><i class='fas fa-seedling'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Gluten Free</p>';
   }
 
   if (recipeObj.dairyFree) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #b3b3b3; margin: 7px; border: 2px solid #b3b3b3; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Dairy Free'><i class='fas fa-egg'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #b3b3b3; margin: 5px; border: 2px solid #b3b3b3; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Dairy Free'><i class='fas fa-egg'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Dairy Free</p>';
   }
 
   if (recipeObj.veryHealthy) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #ff4d4d; margin: 7px; border: 2px solid #ff4d4d; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Very Healthy'><i class='fas fa-heartbeat'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #ff4d4d; margin: 5px; border: 2px solid #ff4d4d; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Very Healthy'><i class='fas fa-heartbeat'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Very Healthy</p>';
   }
 
   if (recipeObj.cheap) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #33cc33; margin: 7px; border: 2px solid #33cc33; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Cheap'><i class='fas fa-comment-dollar'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #33cc33; margin: 5px; border: 2px solid #33cc33; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Cheap'><i class='fas fa-comment-dollar'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Cheap</p>';
   }
 
   if (recipeObj.sustainable) {
     dietMarkUp +=
-      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #804000; margin: 7px; border: 2px solid #804000; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Sustainable'><i class='fas fa-archive'></i></span>";
+      "<span class='shadow rounded-circle diet-icon d-inline-block text-center' style='padding: 5px; color: #804000; margin: 5px; border: 2px solid #804000; min-width: 38px;' data-toggle='tooltip' data-placement='top' title='Sustainable'><i class='fas fa-archive'></i></span>";
 
     recipeInfoData += '<p style="margin-bottom: 8px !important"><i class="fas fa-clipboard-check" style="color: #33cc33"></i> Sustainable</p>';
   }
@@ -147,6 +251,9 @@ async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
   } else if (callingFrom === "mealPlanTab") {
     clicked_btn.disabled = true;
     clicked_btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...';
+  } else if (callingFrom === "favouritesTab") {
+    clicked_btn.disabled = true;
+    clicked_btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...';
   }
 
   try {
@@ -186,6 +293,12 @@ async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
       createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-mealPlanTab");
       $("#mealPlan-main-container").css("display", "none");
       $("#recipeInfo-tab-mealPlanTab").css("display", "flex");
+    } else if (callingFrom === "favouritesTab") {
+      clicked_btn.innerHTML = '<i class="fas fa-info-circle mr-1"></i>More info';
+      clicked_btn.disabled = false;
+      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-favouritesTab");
+      $("#favouritesTab-main-container").css("display", "none");
+      $("#recipeInfo-tab-favouritesTab").css("display", "flex");
     }
   } catch (err) {
     console.log(err);
@@ -301,7 +414,7 @@ function createRecipeSummary(recipeObj, searchTab) {
 
   let buttonsMarkUp = "";
   let historyBtn = "";
-  if (searchTab !== "-mealPlanTab") {
+  if (searchTab !== "-mealPlanTab" && searchTab !== "-favouritesTab") {
     historyBtn = `<button class="btn btn-info" onclick="removeFromHistory(${recipeObj.id}, this, '${searchTab.length > 0 ? "searchTabHistory" : "historyTab"}')">Remove from history<i class="fas fa-trash ml-2"></i></button>`;
   }
 
@@ -330,9 +443,9 @@ function createRecipeIngTab(ingArr, recipeEquipment, searchTab) {
         <div class="popover-header">Ingredient options<a href="#" data-toggle-role="close" style="float: right;"><span aria-hidden="true" style="font-size: 20px">&times;</span></a>
         </div>
         <div class="popover-body">
-          <p style="margin-bottom: 5px !important"><button onclick='addToShoppingList(${JSON.stringify(ing)}, "ingredients", this)' class="btn btn-success btn-block btn-sm" ${checkLS === true ? "disabled" : ""}>${
-        checkLS === true ? "<i class='fas fa-check mr-1'></i>Added to the list" : '<i class="fas fa-list-ul mr-2"></i>Add to shopping list'
-      }</button></p>
+          <p style="margin-bottom: 5px !important"><button data-item='${JSON.stringify({ id: ing.id, image: ing.image, name: ing.name })}' onclick='addToShoppingList("ingredients", this)' class="btn btn-success btn-block btn-sm" ${
+        checkLS === true ? "disabled" : ""
+      }>${checkLS === true ? "<i class='fas fa-check mr-1'></i>Added to the list" : '<i class="fas fa-list-ul mr-2"></i>Add to shopping list'}</button></p>
           <p style="margin-bottom: 0px !important"><button onclick="getSubstitutes(${ing.id}, this)" class="btn btn-info btn-block btn-sm"><i class="fas fa-sync-alt mr-2"></i>Ask for substitutes</button></p>
           <div id="sub-list-${ing.id}"></div>
         </div>
@@ -435,14 +548,17 @@ function createWinePairingTab(winePairingObj, searchTab) {
 
     if (winePairingObj.productMatches.length > 0) {
       const product = winePairingObj.productMatches[0];
-      delete product.link;
       const checkLS = checkItemInShoppingList(product, "wines");
       if (checkLS === true) {
         $("#wineMatch-title" + searchTab).html(product.title + `<button class='btn btn-success btn-sm' style="position: absolute; right: 20px" disabled><i class='fas fa-check mr-1'></i>Added to the list</button>`);
       } else {
         $("#wineMatch-title" + searchTab).html(
           product.title +
-            `<button class='btn btn-success btn-sm float-right' style="position: absolute; right: 20px" onclick='addToShoppingList(${JSON.stringify(product)}, "wines", this)'><i class="fas fa-list-ul mr-2"></i>Add to shopping list</button>`
+            `<button class='btn btn-success btn-sm float-right' style="position: absolute; right: 20px" data-item='${JSON.stringify({
+              id: product.id,
+              title: product.title,
+              imageUrl: product.imageUrl
+            })}' onclick='addToShoppingList("wines", this)'><i class="fas fa-list-ul mr-2"></i>Add to shopping list</button>`
         );
       }
 
@@ -511,25 +627,27 @@ function closeSubstitutesList(ing_id) {
   $(`#sub-list-${ing_id}`).empty();
 }
 
-function addToShoppingList(itemObj, type, clicked_btn) {
-  const shoppingList = localStorage.getItem("shopping-list");
+function addToShoppingList(type, clicked_btn) {
+  const itemObj = JSON.parse(clicked_btn.dataset.item);
+  const shoppingList = localStorage.getItem("shoppingList");
   if (shoppingList) {
     const shoppingListParsed = JSON.parse(shoppingList);
     if (shoppingListParsed[type]) {
       shoppingListParsed[type].push(itemObj);
-      localStorage.setItem("shopping-list", JSON.stringify(shoppingListParsed));
+      localStorage.setItem("shoppingList", JSON.stringify(shoppingListParsed));
     } else {
       shoppingListParsed[type] = [itemObj];
-      localStorage.setItem("shopping-list", JSON.stringify(shoppingListParsed));
+      localStorage.setItem("shoppingList", JSON.stringify(shoppingListParsed));
     }
   } else {
     const shoppingListObj = {};
     shoppingListObj[type] = [itemObj];
-    localStorage.setItem("shopping-list", JSON.stringify(shoppingListObj));
+    localStorage.setItem("shoppingList", JSON.stringify(shoppingListObj));
   }
 
   clicked_btn.innerHTML = "<i class='fas fa-check mr-1'></i>Added to the list";
   clicked_btn.disabled = true;
+  createShoppingListTab();
 
   if (type === "ingredients") {
     $(`#ingImg-${itemObj.id}`).css("border", "3px solid #33cc33");
@@ -537,8 +655,21 @@ function addToShoppingList(itemObj, type, clicked_btn) {
   }
 }
 
+function removeFromShoppingList(item_id, type) {
+  const LSobject = JSON.parse(localStorage.getItem("shoppingList"));
+  const index = LSobject[type].findIndex(el => el.id === item_id);
+  LSobject[type].splice(index, 1);
+
+  localStorage.setItem("shoppingList", JSON.stringify(LSobject));
+  createShoppingListTab();
+
+  if (type === "wines") {
+    $("#myModal").modal("hide");
+  }
+}
+
 function checkItemInShoppingList(itemObj, type) {
-  const shoppingList = localStorage.getItem("shopping-list");
+  const shoppingList = localStorage.getItem("shoppingList");
   if (shoppingList) {
     const shoppingListParsed = JSON.parse(shoppingList);
     if (shoppingListParsed[type]) {
@@ -616,15 +747,26 @@ function likeRecipe(recipeObj, clicked_btn) {
 
   if (favourites) {
     const favouritesArr = JSON.parse(favourites);
-    favouritesArr.push(recipeObj);
+    favouritesArr.unshift(recipeObj);
     localStorage.setItem("favouriteRecipes", JSON.stringify(favouritesArr));
+    $("#favRecipes-badge").text(favouritesArr.length);
   } else {
     const recipes = [recipeObj];
     localStorage.setItem("favouriteRecipes", JSON.stringify(recipes));
+    $("#favRecipes-badge").text(recipes.length);
   }
 
   clicked_btn.innerHTML = 'Added to favourites<i class="fas fa-heart ml-2"></i>';
   clicked_btn.disabled = true;
+}
+
+function removeFavouriteRecipe(recipe_id) {
+  const favouriteRecipes = JSON.parse(localStorage.getItem("favouriteRecipes"));
+  const index = favouriteRecipes.findIndex(el => el.id === recipe_id);
+  favouriteRecipes.splice(index, 1);
+
+  localStorage.setItem("favouriteRecipes", JSON.stringify(favouriteRecipes));
+  createFavouriteRecipesTab();
 }
 
 function checkRecipeInFavourites(recipe_id) {
@@ -1155,6 +1297,9 @@ function createWeekMealPlanHTML(dataObj, localStorage = false) {
   if (localStorage) {
     document.getElementById("saveMealPlanWeekly--btn").disabled = true;
     document.getElementById("saveMealPlanWeekly--btn").innerHTML = '<i class="fas fa-check-circle mr-1"></i> Saved';
+  } else {
+    document.getElementById("saveMealPlanWeekly--btn").disabled = false;
+    document.getElementById("saveMealPlanWeekly--btn").innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i> Save';
   }
 
   $("#list-monday-list").addClass("active");
@@ -1204,6 +1349,9 @@ function createOneDayMealPlanHTML(dataObj, localStorage = false) {
   if (localStorage) {
     document.getElementById("saveMealPlanDaily--btn").disabled = true;
     document.getElementById("saveMealPlanDaily--btn").innerHTML = '<i class="fas fa-check-circle mr-1"></i> Saved';
+  } else {
+    document.getElementById("saveMealPlanDaily--btn").disabled = false;
+    document.getElementById("saveMealPlanDaily--btn").innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i> Save';
   }
 
   $("#oneDay-mealPlan-row").empty();
@@ -1241,5 +1389,376 @@ function checkMealPlanInLS() {
     }
   } else {
     return false;
+  }
+}
+
+function displayChatbotTab() {
+  if (chatbotDisplayed === false) {
+    customizeChatbot();
+  } else {
+    welcomeBackTypeWriter();
+  }
+  $("#history-card").css("display", "none");
+  chatbotDisplayed = true;
+}
+
+function customizeChatbot() {
+  const genderArr = ["male", "female"];
+  const randomNumber = Math.round(Math.random());
+  const gender = genderArr[randomNumber];
+
+  const welcomeText = `Hello there! My name is ${
+    gender === "male" ? "Bryan" : "Jessica"
+  }. I am kind of bored and would appreciate if you have a few minutes to chat with me. You can say or ask me anything and l will let you know if l have any suggestions :)`;
+
+  $("#chatbot-img").attr("src", `./avatars/${gender}.png`);
+  $("#chatbot-name").text(`${gender === "male" ? "Bryan" : "Jessica"}`);
+
+  let i = 0;
+  const speed = 30;
+
+  function typeWriter() {
+    if (i < welcomeText.length) {
+      if (i === 12) {
+        document.getElementById("welcome-text").innerHTML += '<i class="fas fa-hand-paper ml-2" style="font-size: 25px; color: #ffd480;" id="animation-hand"></i><br>';
+        document.getElementById("animation-hand").style.animation = "shake 0.1s";
+        document.getElementById("animation-hand").style.animationIterationCount = "infinite";
+        setTimeout(typeWriter, 700);
+      } else {
+        document.getElementById("welcome-text").innerHTML += welcomeText.charAt(i);
+        if (document.getElementById("animation-hand")) {
+          document.getElementById("animation-hand").style.animation = "none";
+        }
+        setTimeout(typeWriter, speed);
+      }
+
+      i++;
+    } else {
+      $("#conversation-suggestions-col").show(600);
+    }
+  }
+
+  typeWriter();
+}
+
+async function getConversationSuggestions(query) {
+  if (query.length > 0 && query !== " ") {
+    document.getElementById("ask--btn").disabled = false;
+    document.getElementById("empty-field--btn").disabled = false;
+    try {
+      const response = await fetch(`https://api.spoonacular.com/food/converse/suggest?query=${query}&number=5&apiKey=${apiKey}`);
+      const responseParsed = await response.json();
+
+      if (responseParsed.suggests._.length > 0) {
+        $("#suggestions-list").empty();
+        responseParsed.suggests._.forEach(suggestion => {
+          const markUp = `<a href="#" style="padding: 5px 15px !important;" class="list-group-item list-group-item-action" onclick="appendQuestionToInput(this)">${suggestion.name}</a>`;
+          $("#suggestions-list").append(markUp);
+        });
+
+        $("#suggestions-dropdown").css("display", "block");
+      } else {
+        $("#suggestions-dropdown").css("display", "none");
+      }
+    } catch (err) {
+      console.log(err);
+      Swal.fire("Ooops!", "Server error! Please try again.", "error");
+    }
+  } else {
+    document.getElementById("ask--btn").disabled = true;
+    document.getElementById("empty-field--btn").disabled = true;
+    $("#suggestions-dropdown").css("display", "none");
+  }
+}
+
+function hideSuggestionsDropdown(value) {
+  if (value.length === 0 || value === " ") {
+    $("#suggestions-dropdown").css("display", "none");
+  }
+}
+
+async function talkToChatbot() {
+  document.getElementById("ask--btn").disabled = true;
+  document.getElementById("ask--btn").innerHTML = "Thinking...";
+  document.getElementById("empty-field--btn").disabled = true;
+  try {
+    const question = $("#conversation-subject").val();
+    const response = await fetch(`https://api.spoonacular.com/food/converse?text=${question.replace(/ /g, "+")}&apiKey=${apiKey}`);
+    const responseParsed = await response.json();
+
+    const chatbotName = $("#chatbot-name").text();
+    const answerMarkup = `<div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <p style="margin-bottom: 5px !important"><strong>Me:</strong> ${question}</p>
+      <p style="margin-bottom: 0px !important"><strong>${chatbotName}:</strong> ${responseParsed.answerText}</p>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+
+    $("#answers-list").prepend(answerMarkup);
+    document.getElementById("ask--btn").disabled = false;
+    document.getElementById("ask--btn").innerHTML = "Ask question";
+    document.getElementById("empty-field--btn").disabled = false;
+    emptyQuestionInput();
+  } catch (err) {
+    console.log(err);
+    Swal.fire("Ooops!", "Server error! Please try again.", "error");
+    document.getElementById("ask--btn").disabled = false;
+    document.getElementById("ask--btn").innerHTML = "Ask question";
+    document.getElementById("empty-field--btn").disabled = false;
+  }
+}
+
+function appendQuestionToInput(clicked_element) {
+  const text = clicked_element.innerText;
+  $("#conversation-subject").val(text);
+  $("#suggestions-dropdown").css("display", "none");
+}
+
+function emptyQuestionInput() {
+  $("#conversation-subject").val("");
+  document.getElementById("ask--btn").disabled = true;
+  document.getElementById("empty-field--btn").disabled = true;
+}
+
+function welcomeBackTypeWriter() {
+  let i = 0;
+  const speed = 50;
+  const text = "Nice to see you again! :)";
+  $("#welcome-back-text").text("");
+
+  function typeWriter() {
+    if (i < text.length) {
+      document.getElementById("welcome-back-text").innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeWriter, speed);
+    }
+  }
+
+  typeWriter();
+}
+
+function changeWineFilters(input_value) {
+  const allInputs = document.querySelectorAll(".wine-inputs");
+  allInputs.forEach(input => (input.style.display = "none"));
+  $(`#${input_value}-inputTab`).show(700);
+}
+
+function enableBtn(btn_id, input_value) {
+  if (input_value.length > 0 && input_value !== " ") {
+    document.getElementById(btn_id).disabled = false;
+  } else {
+    document.getElementById(btn_id).disabled = true;
+  }
+}
+
+async function getWinesHandler(type, clicked_btn) {
+  clicked_btn.disabled = true;
+  clicked_btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
+  let query;
+  let resultHandlerFunction;
+  let wine;
+
+  if (type === "dish-pairing") {
+    wine = $(`#${type}-input`).val();
+    query = `dishes?wine=${wine}`;
+    resultHandlerFunction = createDishPairingAlert;
+  } else if (type === "wine-pairing") {
+    wine = $(`#${type}-input`).val();
+    const maxPrice = $(`#${type}-input-maxPrice`).val();
+    query = `pairing?food=${wine}${maxPrice !== null ? "&maxPrice=" + maxPrice : ""}`;
+    resultHandlerFunction = createWinePairingAlert;
+  } else if (type === "wine-description") {
+    wine = $(`#${type}-input`).val();
+    query = `description?wine=${wine}`;
+    resultHandlerFunction = createWineDescriptionAlert;
+  } else {
+    wine = $(`#${type}-input`).val();
+    const maxPrice = $(`#${type}-input-maxPrice`).val();
+    const minRating = $(`#${type}-input-minRating`).val();
+    query = `recommendation?wine=${wine}&number=6${maxPrice !== null ? "&maxPrice=" + maxPrice : ""}${minRating !== null ? "&minRating=" + minRating : ""}`;
+    resultHandlerFunction = createWineRecommendationAlert;
+  }
+
+  try {
+    const response = await fetch(`https://api.spoonacular.com/food/wine/${query}&apiKey=${apiKey}`);
+    const responseParsed = await response.json();
+    if (responseParsed.status === "failure") {
+      resultHandlerFunction({ text: "", wineDescription: "", pairingText: "", recommendedWines: [] }, wine);
+    } else {
+      resultHandlerFunction(responseParsed, wine);
+    }
+
+    $(`#${type}-input`).val("");
+    clicked_btn.disabled = false;
+    clicked_btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit';
+  } catch (err) {
+    console.log(err);
+    Swal.fire("Ooops!", "Server error! Please try again.", "error");
+    clicked_btn.disabled = false;
+    clicked_btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit';
+  }
+}
+
+function createDishPairingAlert(response, wine) {
+  const text = response.text;
+  const alertMarkup = `<div class="alert shadow-sm alert-danger alert-dismissible fade show" style="padding: 20px" role="alert">
+    <h5>Dish pairing for '${wine}'</h5>
+    <p>${text.length > 0 ? text : "Sorry, there are no results matching this criteria."}</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>`;
+
+  $("#wine-results-row").prepend(alertMarkup);
+}
+
+function createWinePairingAlert(response, food) {
+  let productMarkup = "";
+  if (response.productMatches) {
+    const product = response.productMatches[0];
+    if (product) {
+      const checkLS = checkItemInShoppingList(product, "wines");
+      let description = product.description;
+      if (description.length > 490) {
+        description = product.description.substring(0, 490);
+        description += "...";
+      }
+      productMarkup = `<div class="card shadow-sm mt-3" style="max-width: 100%; max-height: 395px !important; color: #4d4d4d !important;">
+      <div class="row no-gutters">
+        <div class="col-md-3">
+          <img src="${product.imageUrl}" class="card-img" alt="${product.title}" style="object-fit: cover; max-height: 393px !important">
+        </div>
+        <div class="col-md-9">
+          <div class="card-body" style="padding: 10px !important">
+            <h5 class="card-title">${product.title}</h5>
+            <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Average rating: </span>${product.averageRating.toFixed(2)} (${product.ratingCount} ratings)</p>
+            <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Score: </span>${product.score.toFixed(2)}</p>
+            ${description !== null ? '<p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Description: </span>' + description + "</p>" : ""}
+            <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Price: </span>${product.price}</p>
+            <button data-item='${JSON.stringify({
+              id: product.id,
+              title: product.title,
+              imageUrl: product.imageUrl
+            })}' onclick='addToShoppingList("wines", this)' class="btn btn-success btn-sm mb-3" style="position: absolute; right: 10px; bottom: 0px; margin-top: 10px" ${checkLS === true ? "disabled" : ""}>${
+        checkLS === false ? '<i class="fas fa-list-ul mr-2"></i>Add to shopping list' : '<i class="fas fa-check mr-1"></i>Added to the list'
+      }</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    }
+  }
+
+  const text = response.pairingText;
+  const alertMarkup = `<div class="alert alert-danger alert-dismissible fade show shadow-sm" style="padding: 20px" role="alert">
+    <h5>Wine pairing for '${food}'</h5>
+    <p>${text.length > 0 ? text : "Sorry, there are no results matching this criteria."}</p>
+    ${productMarkup}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>`;
+
+  $("#wine-results-row").prepend(alertMarkup);
+  $(`#wine-pairing-input-maxPrice`).val("");
+}
+
+function createWineDescriptionAlert(response, wine) {
+  const text = response.wineDescription;
+  const alertMarkup = `<div class="alert alert-danger alert-dismissible fade show shadow-sm" style="padding: 20px" role="alert">
+    <h5>Description for '${wine}'</h5>
+    <p>${text.length > 0 ? text : "Sorry, there are no results matching this criteria."}</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>`;
+
+  $("#wine-results-row").prepend(alertMarkup);
+}
+
+function createWineRecommendationAlert(response, wine) {
+  let cardsMarkup = "";
+  if (response.recommendedWines.length > 0) {
+    response.recommendedWines.forEach(product => {
+      let description;
+      if (product.description !== null) {
+        description = product.description;
+      } else {
+        description = "There is no description for this product.";
+      }
+
+      const checkLS = checkItemInShoppingList(product, "wines");
+      cardsMarkup += `<div class="col-lg-6"><div class="card shadow-sm mt-3" data-toggle="tooltip" data-placement="right" title="${description}" style="height: 230px !important; color: #4d4d4d !important; font-size: 14px;">
+        <div class="row no-gutters">
+          <div class="col-md-4">
+            <img src="${product.imageUrl}" class="card-img" alt="${product.title}" style="object-fit: cover; height: 228px !important">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body" style="padding: 10px !important">
+              <h5 class="card-title">${product.title}</h5>
+              <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Average rating: </span>${product.averageRating.toFixed(2)}</p>
+              <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Rating count: </span>${product.ratingCount} ratings</p>
+              <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Score: </span>${product.score.toFixed(2)}</p>
+              <p class="card-text" style="margin-bottom: 3px !important"><span style="font-weight: 500">Price: </span>${product.price}</p>
+              <button data-item='${JSON.stringify({
+                id: product.id,
+                title: product.title,
+                imageUrl: product.imageUrl
+              })}' onclick='addToShoppingList("wines", this)' class="btn btn-success btn-sm mb-3" style="position: absolute; right: 10px; bottom: 0px; margin-top: 10px" ${checkLS === true ? "disabled" : ""}>${
+        checkLS === false ? '<i class="fas fa-list-ul mr-2"></i>Add to shopping list' : '<i class="fas fa-check mr-1"></i>Added to the list'
+      }</button>
+            </div>
+          </div>
+        </div>
+      </div></div>`;
+    });
+  } else {
+    cardsMarkup = "<p style='margin-left: 15px;'>Sorry, there are no results matching this criteria.</p>";
+  }
+
+  const alertMarkup = `<div class="alert alert-danger alert-dismissible fade show shadow-sm" style="padding: 20px" role="alert">
+    <h5>Wine recommendations for '${wine}'</h5>
+    <div class="row">${cardsMarkup}</div>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>`;
+
+  $("#wine-results-row").prepend(alertMarkup);
+  $(`#wine-recommendation-input-maxPrice`).val("");
+  $(`#wine-recommendation-input-minRating`).val("");
+  $('[data-toggle="tooltip"]').tooltip();
+}
+
+function displayWinesTab() {
+  $("#history-card").css("display", "none");
+}
+
+function goBackToFavourites() {
+  $("#recipeInfo-tab-favouritesTab").css("display", "none");
+  $("#favouritesTab-main-container").css("display", "flex");
+}
+
+async function getWineDetailsModal(wine_id) {
+  $("#main-row-modal").css("display", "none");
+  $("#spinner-modal").css("display", "flex");
+
+  try {
+    const response = await fetch(`https://api.spoonacular.com/food/products/${wine_id}?apiKey=${apiKey}`);
+    const responseParsed = await response.json();
+
+    const price = (responseParsed.price / 100).toFixed(2);
+    $("#wine-img-modal").attr("src", responseParsed.images[1]);
+    $("#wine-title-modal").text(responseParsed.title);
+    $("#wine-description-modal").text(responseParsed.description);
+    $("#wine-price-modal").text(price);
+    $("#remove-btn-modal").attr("onclick", `removeFromShoppingList(${wine_id}, "wines")`);
+
+    $("#spinner-modal").css("display", "none");
+    $("#main-row-modal").css("display", "flex");
+  } catch (err) {
+    console.log(err);
+    Swal.fire("Ooops!", "Server error! Please try again.", "error");
   }
 }

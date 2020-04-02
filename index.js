@@ -26,7 +26,7 @@ function hideRemoveBtn(ingredient_id) {
   $(`#remove-ingredient-btn-${ingredient_id}`).css("visibility", "hidden");
 }
 
-function createShoppingListTab() {
+function createShoppingListTab(displayMainTab = false) {
   const listLS = localStorage.getItem("shoppingList");
   if (listLS) {
     let number = 0;
@@ -83,7 +83,9 @@ function createShoppingListTab() {
     $("#no-list-title").css("display", "block");
   }
 
-  $("#history-card").css("display", "none");
+  if (displayMainTab) {
+    $("#history-card").css("display", "none");
+  }
 }
 
 function createFavouriteRecipesTab() {

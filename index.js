@@ -1,5 +1,5 @@
-const apiKey = "791d9715b9454e049e21c5c9b46ca8df";
-// const apiKey = "1fa9fd007ea14a9db14691c266865645";
+// const apiKey = "791d9715b9454e049e21c5c9b46ca8df";
+const apiKey = "1fa9fd007ea14a9db14691c266865645";
 let searchResultsGlobal;
 let chatbotDisplayed = false;
 
@@ -46,7 +46,6 @@ function createShoppingListTab(displayMainTab = false) {
 
       $("#groceries-list-group").empty();
       $("#groceries-list-group").append(ingredientsList);
-      $('[data-toggle="tooltip"]').tooltip();
       $("#groceries-list-container").css("display", "block");
     } else {
       $("#groceries-list-container").css("display", "none");
@@ -140,7 +139,7 @@ function createRandomRecipeCard(recipeObj) {
 
   const markUp = `<div class="col-lg-4 mb-5">
         <div class="card shadow card--hover">
-        <img src="${recipeObj.image !== undefined ? recipeObj.image : "http://placehold.it/500x300"}" class="card-img-top" alt="..." style="object-fit: cover" />
+        <img src="${recipeObj.image !== undefined ? recipeObj.image : "http://placehold.it/556x370"}" class="card-img-top" alt="..." style="object-fit: cover" />
         <div class="card-body recipe-card">
             <h4 class="card-title text-center">${recipeObj.title}</h4>
             ${dishTypes.length > 0 ? '<p class="alert alert-success alert-modified" role="alert">Dish type: ' + dishTypes + "</p>" : ""}
@@ -150,7 +149,7 @@ function createRandomRecipeCard(recipeObj) {
                 <p>Spoonacular score: <span ${recipeObj.spoonacularScore > 60 ? 'class="badge badge-success text-wrap"' : 'class="badge badge-warning text-wrap"'}>${recipeObj.spoonacularScore} %</span></p>
             </div>
             <p style="margin-top: 10px; margin-bottom: 10px">${dietMarkUp}</p>
-            <button class="btn btn-warning btn-block btn-sm" onclick="getRecipeInfo(${recipeObj.id}, this, 'randomRecipesTab')">Check out more info</button>
+            <button class="btn btn-warning btn-block btn-sm" onclick="getRecipeInfo(${recipeObj.id}, this, 'randomRecipesTab')"><i class="fas fa-info-circle mr-1"></i>More info</button>
         </div>
         </div>
     </div>`;
@@ -235,6 +234,22 @@ function modifyDishType(arr) {
   return result;
 }
 
+function removeRecipeIfExists(arr, recipe_id, recipe_title) {
+  let index;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id === recipe_id || arr[i].title === recipe_title) {
+      index = i;
+      break;
+    }
+  }
+
+  if (isNaN(index) === false) {
+    arr.splice(index, 1);
+  } else {
+    return;
+  }
+}
+
 async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
   if (callingFrom === "randomRecipesTab") {
     clicked_btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...';
@@ -245,6 +260,9 @@ async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
     $("#main-spinner").css("display", "flex");
   } else if (callingFrom === "searchTab") {
     $(`#spinner-search-result-${recipe_id}`).css("display", "inline-block");
+    clicked_btn.disabled = true;
+  } else if (callingFrom === "searchTabSimilar") {
+    clicked_btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...';
     clicked_btn.disabled = true;
   } else if (callingFrom === "searchTabHistory") {
     $("#recipe-search-main-container").css("display", "none");
@@ -264,28 +282,42 @@ async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
     console.log(recipeCalls);
 
     if (callingFrom === "randomRecipesTab") {
-      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2]);
+      const similarRecipesArr = await getSimilarRecipes(recipe_id);
+      removeRecipeIfExists(similarRecipesArr, recipe_id, recipeCalls[0].title);
+      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "", similarRecipesArr);
       addRecipeToHistory(recipe_id, recipeCalls[0].title, "historyTab");
-      clicked_btn.innerHTML = "Check out more info";
+      clicked_btn.innerHTML = '<i class="fas fa-info-circle mr-1"></i>More info';
       clicked_btn.disabled = false;
       $("#randomRecipes-tab").css("display", "none");
       $("#recipeInfo-tab").css("display", "flex");
     } else if (callingFrom === "historyTab") {
-      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2]);
+      const similarRecipesArr = await getSimilarRecipes(recipe_id);
+      removeRecipeIfExists(similarRecipesArr, recipe_id, recipeCalls[0].title);
+      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "", similarRecipesArr);
       addRecipeToHistory(recipe_id, recipeCalls[0].title, "historyTab");
       $("#main-spinner").css("display", "none");
       $("#randomRecipes-tab").css("display", "none");
       $("#recipeInfo-tab").css("display", "flex");
     } else if (callingFrom === "searchTab") {
+      const similarRecipesArr = await getSimilarRecipes(recipe_id);
       $(`#spinner-search-result-${recipe_id}`).css("display", "none");
       clicked_btn.disabled = false;
-      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-searchTab");
+      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-searchTab", similarRecipesArr);
       addRecipeToHistory(recipe_id, recipeCalls[0].title, "searchTabHistory");
       $("#recipe-search-main-container").css("display", "none");
       $("#recipeInfo-tab-searchTab").css("display", "flex");
+    } else if (callingFrom === "searchTabSimilar") {
+      const similarRecipesArr = await getSimilarRecipes(recipe_id);
+      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-searchTab", similarRecipesArr);
+      addRecipeToHistory(recipe_id, recipeCalls[0].title, "searchTabHistory");
+      $("#recipe-search-main-container").css("display", "none");
+      $("#recipeInfo-tab-searchTab").css("display", "flex");
+      clicked_btn.disabled = false;
+      clicked_btn.innerHTML = '<i class="fas fa-info-circle mr-1"></i>More info';
     } else if (callingFrom === "searchTabHistory") {
+      const similarRecipesArr = await getSimilarRecipes(recipe_id);
       $("#main-spinner-searchTab").css("display", "none");
-      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-searchTab");
+      createRecipeInfoHTML(recipeCalls[0], recipeCalls[1], recipeCalls[2], "-searchTab", similarRecipesArr);
       addRecipeToHistory(recipe_id, recipeCalls[0].title, "searchTabHistory");
       $("#recipe-search-main-container").css("display", "none");
       $("#recipeInfo-tab-searchTab").css("display", "flex");
@@ -306,7 +338,7 @@ async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
     console.log(err);
     Swal.fire("Ooops!", "Server error! Please try again.", "error");
     if (callingFrom === "randomRecipesTab") {
-      clicked_btn.innerHTML = "Check out more info";
+      clicked_btn.innerHTML = '<i class="fas fa-info-circle mr-1"></i>More info';
     }
     if (callingFrom === "searchTab") {
       $(`#spinner-search-result-${recipe_id}`).css("display", "none");
@@ -315,12 +347,19 @@ async function getRecipeInfo(recipe_id, clicked_btn, callingFrom) {
   }
 }
 
+async function getSimilarRecipes(recipe_id) {
+  const response = await fetch(`https://api.spoonacular.com/recipes/${recipe_id}/similar?number=6&apiKey=${apiKey}`);
+  const responseParsed = await response.json();
+
+  return responseParsed;
+}
+
 function goBackToRandomRecipes() {
   $("#randomRecipes-tab").css("display", "flex");
   $("#recipeInfo-tab").css("display", "none");
 }
 
-function createRecipeInfoHTML(recipeObj, recipeEquipment, nutritionWidget, searchTab = "") {
+function createRecipeInfoHTML(recipeObj, recipeEquipment, nutritionWidget, searchTab = "", similarRecipesArr = false) {
   $("#recipeInfo--title" + searchTab).text(recipeObj.title);
   $("#recipeInfo--image" + searchTab).attr("src", recipeObj.image);
 
@@ -343,6 +382,14 @@ function createRecipeInfoHTML(recipeObj, recipeEquipment, nutritionWidget, searc
   createNutritionTab(nutritionWidget, searchTab);
   createInstructionsTab(recipeObj.analyzedInstructions, searchTab);
   createWinePairingTab(recipeObj.winePairing, searchTab);
+  if (similarRecipesArr) {
+    if (similarRecipesArr.length > 0) {
+      createSimilarRecipesTab(similarRecipesArr, searchTab);
+      $(`#nav-similar-tab${searchTab}`).css("display", "block");
+    } else {
+      $(`#nav-similar-tab${searchTab}`).css("display", "none");
+    }
+  }
 
   document
     .querySelector("#nav-tab" + searchTab)
@@ -401,18 +448,38 @@ async function getRecipeNutritionWidget(recipe_id) {
   return responseParsed;
 }
 
-function createRecipeSummary(recipeObj, searchTab) {
-  const summaryArr = recipeObj.summary.split(". ");
-  const finalArr = [];
-  summaryArr.forEach(sentence => {
-    if (sentence.includes("href") === false) {
-      finalArr.push(sentence);
-    }
+function createSimilarRecipesTab(recipesArr, tab) {
+  let cardsMarkup = "";
+  recipesArr.forEach(recipe => {
+    cardsMarkup += `<div class="col-lg-4 mb-3 mt-3"><div class="card shadow">
+      <img src=" https://spoonacular.com/recipeImages/${recipe.id}-480x360.jpg" class="card-img-top" alt="${recipe.title}-image">
+      <div class="card-body" style="padding: 10px !important">
+        <h6 class="card-subtitle mb-2 text-muted text-center">${recipe.title}</h6>
+        <button class="btn btn-warning btn-sm float-right" onclick="getRecipeInfo(${recipe.id}, this, '${tab === "" ? "randomRecipesTab" : "searchTabSimilar"}')"><i class="fas fa-info-circle mr-1"></i>More info</button>
+      </div>
+    </div></div>`;
   });
-  finalArr[finalArr.length - 1] += ".";
 
-  const result = finalArr.join(". ");
-  $("#recipe-summary" + searchTab).html(result);
+  $(`#nav-similar${tab}`).empty();
+  $(`#nav-similar${tab}`).html(`<div class="row">${cardsMarkup}</div>`);
+}
+
+function createRecipeSummary(recipeObj, searchTab) {
+  if (recipeObj.summary.length > 0) {
+    const summaryArr = recipeObj.summary.split(". ");
+    const finalArr = [];
+    summaryArr.forEach(sentence => {
+      if (sentence.includes("href") === false) {
+        finalArr.push(sentence);
+      }
+    });
+    finalArr[finalArr.length - 1] += ".";
+
+    const result = finalArr.join(". ");
+    $("#recipe-summary" + searchTab).html(result);
+  } else {
+    $("#recipe-summary" + searchTab).html("Sorry, no description available for this recipe.");
+  }
 
   let buttonsMarkUp = "";
   let historyBtn = "";
@@ -437,10 +504,10 @@ function createRecipeIngTab(ingArr, recipeEquipment, searchTab) {
   ingArr.forEach(ing => {
     if (ing.id !== null) {
       const checkLS = checkItemInShoppingList(ing, "ingredients");
-      ingHTML += `<div class='col-lg-2 mb-3' style="padding: 0px 10px !important"><p style='margin-bottom: 2px !important' class="text-center">${ing.measures.us.amount} ${ing.measures.us.unitLong}</p><span class="popover-wrapper">
+      ingHTML += `<div class='col-lg-2 mb-3' style="padding: 0px 10px !important"><p style='margin-bottom: 2px !important; font-size: 18px;' class="text-center">${ing.measures.us.amount} ${ing.measures.us.unitLong}</p><span class="popover-wrapper">
       <img data-role="popover" id="ingImg-${ing.id}" class="img-hover" onclick="closeSubstitutesList(${ing.id});" data-target="example-popover" width="100%" height="140px" src="https://spoonacular.com/cdn/ingredients_250x250/${
         ing.image
-      }" style="object-fit: cover; background-color: #fff; border: ${checkLS === true ? "3px solid #33cc33;" : "1px solid #dee2e6; padding: 2px;"} border-radius: .25rem;">
+      }" style="object-fit: cover; background-color: #fff; border: ${checkLS === true ? "3px solid #70db70;" : "1px solid #dee2e6; padding: 2px;"} border-radius: .25rem;">
       <div class="popover-modal example-popover" ontoggle="myfunction()">
         <div class="popover-header">Ingredient options<a href="#" data-toggle-role="close" style="float: right;"><span aria-hidden="true" style="font-size: 20px">&times;</span></a>
         </div>
@@ -652,7 +719,7 @@ function addToShoppingList(type, clicked_btn) {
   createShoppingListTab();
 
   if (type === "ingredients") {
-    $(`#ingImg-${itemObj.id}`).css("border", "3px solid #33cc33");
+    $(`#ingImg-${itemObj.id}`).css("border", "3px solid #70db70");
     $(`#ingImg-${itemObj.id}`).css("padding", "0px");
   }
 }

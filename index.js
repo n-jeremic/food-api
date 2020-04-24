@@ -3,11 +3,11 @@ const apiKey = "1fa9fd007ea14a9db14691c266865645";
 let searchResultsGlobal;
 let chatbotDisplayed = false;
 
-$(function() {
+$(function () {
   $('[data-toggle="tooltip"]').tooltip();
 });
 
-String.prototype.capitalize = function() {
+String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
@@ -34,7 +34,7 @@ function createShoppingListTab(displayMainTab = false) {
     if (listObj.ingredients !== undefined && listObj.ingredients.length > 0) {
       number += listObj.ingredients.length;
       let ingredientsList = "";
-      listObj.ingredients.forEach(ingredient => {
+      listObj.ingredients.forEach((ingredient) => {
         ingredientsList += `<li class="list-group-item list-group-item-action groceries-list-hover" style="background-color: #eaeae1;" onmouseover="displayRemoveBtn(${ingredient.id});" onmouseleave="hideRemoveBtn(${
           ingredient.id
         });"><img width="50px" class="mr-3 shadow-sm rounded" height="50px" src="https://spoonacular.com/cdn/ingredients_250x250/${ingredient.image}">${ingredient.name.capitalize()}<button type="button" id="remove-ingredient-btn-${
@@ -54,7 +54,7 @@ function createShoppingListTab(displayMainTab = false) {
     if (listObj.wines !== undefined && listObj.wines.length > 0) {
       number += listObj.wines.length;
       let winesList = "";
-      listObj.wines.forEach(wine => {
+      listObj.wines.forEach((wine) => {
         winesList += `<button type="button" data-toggle="modal" data-target="#myModal" data-toggle="tooltip" data-placement="top" title="Click for more details" class="list-group-item list-group-item-action" onclick="getWineDetailsModal(${wine.id})">${wine.title}</button>`;
       });
 
@@ -94,7 +94,7 @@ function createFavouriteRecipesTab() {
     if (recipesArr.length > 0) {
       $("#no-recipes-title").css("display", "none");
       let cardsMarkup = "";
-      recipesArr.forEach(recipe => {
+      recipesArr.forEach((recipe) => {
         cardsMarkup += `<div class="col-lg-6 mb-4"><div class="card shadow-sm" style="border: none">
         <img src="${recipe.image}" class="card-img-top" alt="${recipe.title}-img">
         <div class="card-body" style="padding: 10px !important; border: 1px solid rgba(0,0,0,.125); border-radius: 0 0 .25rem .25rem; border-top: none;">
@@ -126,7 +126,7 @@ async function getRandomRecipes() {
     const responseParsed = await response.json();
 
     $("#main-spinner").css("display", "none");
-    responseParsed.recipes.forEach(recipe => createRandomRecipeCard(recipe));
+    responseParsed.recipes.forEach((recipe) => createRandomRecipeCard(recipe));
     console.log(responseParsed);
   } catch (err) {
     console.log(err);
@@ -394,7 +394,7 @@ function createRecipeInfoHTML(recipeObj, recipeEquipment, nutritionWidget, searc
   document
     .querySelector("#nav-tab" + searchTab)
     .querySelectorAll(".nav-item")
-    .forEach(element => {
+    .forEach((element) => {
       if (element.classList.contains("active")) {
         element.classList.remove("active");
       }
@@ -403,7 +403,7 @@ function createRecipeInfoHTML(recipeObj, recipeEquipment, nutritionWidget, searc
   document
     .querySelector("#nav-tabContent" + searchTab)
     .querySelectorAll(".tab-pane")
-    .forEach(tab => {
+    .forEach((tab) => {
       if (tab.classList.contains("active") && tab.classList.contains("show")) {
         tab.classList.remove("active");
         tab.classList.remove("show");
@@ -440,8 +440,8 @@ async function getRecipeEquipment(recipe_id) {
 async function getRecipeNutritionWidget(recipe_id) {
   const response = await fetch(`https://api.spoonacular.com/recipes/${recipe_id}/nutritionWidget?apiKey=${apiKey}&defaultCss=true`, {
     headers: {
-      Accept: "text/html"
-    }
+      Accept: "text/html",
+    },
   });
   const responseParsed = await response.text();
 
@@ -450,7 +450,7 @@ async function getRecipeNutritionWidget(recipe_id) {
 
 function createSimilarRecipesTab(recipesArr, tab) {
   let cardsMarkup = "";
-  recipesArr.forEach(recipe => {
+  recipesArr.forEach((recipe) => {
     cardsMarkup += `<div class="col-lg-4 mb-3 mt-3"><div class="card shadow">
       <img src=" https://spoonacular.com/recipeImages/${recipe.id}-480x360.jpg" class="card-img-top" alt="${recipe.title}-image">
       <div class="card-body" style="padding: 10px !important">
@@ -468,7 +468,7 @@ function createRecipeSummary(recipeObj, searchTab) {
   if (recipeObj.summary.length > 0) {
     const summaryArr = recipeObj.summary.split(". ");
     const finalArr = [];
-    summaryArr.forEach(sentence => {
+    summaryArr.forEach((sentence) => {
       if (sentence.includes("href") === false) {
         finalArr.push(sentence);
       }
@@ -501,7 +501,7 @@ function createRecipeSummary(recipeObj, searchTab) {
 
 function createRecipeIngTab(ingArr, recipeEquipment, searchTab) {
   let ingHTML = "";
-  ingArr.forEach(ing => {
+  ingArr.forEach((ing) => {
     if (ing.id !== null) {
       const checkLS = checkItemInShoppingList(ing, "ingredients");
       ingHTML += `<div class='col-lg-2 mb-3' style="padding: 0px 10px !important"><p style='margin-bottom: 2px !important; font-size: 18px;' class="text-center">${ing.measures.us.amount} ${ing.measures.us.unitLong}</p><span class="popover-wrapper">
@@ -530,7 +530,7 @@ function createRecipeIngTab(ingArr, recipeEquipment, searchTab) {
   if (recipeEquipment.equipment) {
     if (recipeEquipment.equipment.length > 0) {
       let equipHTML = "";
-      recipeEquipment.equipment.forEach(util => {
+      recipeEquipment.equipment.forEach((util) => {
         equipHTML += `<div class="col-lg-2"><img width="100%" alt="${util.name}-photo" height="100px" src="https://spoonacular.com/cdn/equipment_250x250/${util.image}" style="object-fit: cover; padding: 2px; background-color: #fff; border: 1px solid #dee2e6; border-radius: .25rem;"><p style='margin-bottom: 0px !important;' class="text-center">${util.name}</p></div>`;
       });
 
@@ -557,8 +557,8 @@ function createNutritionTab(widget, searchTab) {
 function createInstructionsTab(instructionsArr, searchTab) {
   if (instructionsArr.length > 0) {
     let stepsList = "";
-    instructionsArr.forEach(instruction => {
-      instruction.steps.forEach(step => {
+    instructionsArr.forEach((instruction) => {
+      instruction.steps.forEach((step) => {
         let image;
         let imageName;
         if (step.ingredients.length > 0) {
@@ -626,7 +626,7 @@ function createWinePairingTab(winePairingObj, searchTab) {
             `<button class='btn btn-success btn-sm float-right' style="position: absolute; right: 20px" data-item='${JSON.stringify({
               id: product.id,
               title: product.title,
-              imageUrl: product.imageUrl
+              imageUrl: product.imageUrl,
             })}' onclick='addToShoppingList("wines", this)'><i class="fas fa-list-ul mr-2"></i>Add to shopping list</button>`
         );
       }
@@ -685,7 +685,7 @@ function createSubstitutesList(substitutesArr, ing_id) {
   $(`#sub-list-${ing_id}`).append(`<p class="text-center" style="margin-bottom: 8px !important; margin-top: 8px !important; font-weight: 600;">Found ${substitutesArr.length} substitutes.</p>`);
 
   let list = "";
-  substitutesArr.forEach(item => {
+  substitutesArr.forEach((item) => {
     list += `<li class="list-group-item" style="padding: 7px 12px !important">${item}</li>`;
   });
 
@@ -726,7 +726,7 @@ function addToShoppingList(type, clicked_btn) {
 
 function removeFromShoppingList(item_id, type) {
   const LSobject = JSON.parse(localStorage.getItem("shoppingList"));
-  const index = LSobject[type].findIndex(el => el.id === item_id);
+  const index = LSobject[type].findIndex((el) => el.id === item_id);
   LSobject[type].splice(index, 1);
 
   localStorage.setItem("shoppingList", JSON.stringify(LSobject));
@@ -742,7 +742,7 @@ function checkItemInShoppingList(itemObj, type) {
   if (shoppingList) {
     const shoppingListParsed = JSON.parse(shoppingList);
     if (shoppingListParsed[type]) {
-      const index = shoppingListParsed[type].findIndex(el => el.id === itemObj.id);
+      const index = shoppingListParsed[type].findIndex((el) => el.id === itemObj.id);
       if (index !== -1) {
         return true;
       } else {
@@ -762,7 +762,7 @@ function addRecipeToHistory(recipe_id, recipe_title, tab) {
 
   if (history) {
     const historyArr = JSON.parse(history);
-    const index = historyArr.findIndex(el => el.recipe_id === recipe_id);
+    const index = historyArr.findIndex((el) => el.recipe_id === recipe_id);
     if (index === -1) {
       historyArr.push(object);
       localStorage.setItem("viewHistory", JSON.stringify(historyArr));
@@ -777,7 +777,7 @@ function addRecipeToHistory(recipe_id, recipe_title, tab) {
 
 function removeFromHistory(recipe_id, clicked_btn, tab) {
   const historyArr = JSON.parse(localStorage.getItem("viewHistory"));
-  const index = historyArr.findIndex(el => el.recipe_id === recipe_id);
+  const index = historyArr.findIndex((el) => el.recipe_id === recipe_id);
   historyArr.splice(index, 1);
 
   localStorage.setItem("viewHistory", JSON.stringify(historyArr));
@@ -791,7 +791,7 @@ function createHistoryList(onload = false, tab) {
     const historyParsed = JSON.parse(historyArr);
     if (historyParsed.length > 0) {
       let listItems = "";
-      historyParsed.forEach(el => {
+      historyParsed.forEach((el) => {
         listItems += `<li onclick="getRecipeInfo(${el.recipe_id}, false, '${tab}')" class="recipe-history-item">${el.recipe_title}</li>`;
       });
 
@@ -831,7 +831,7 @@ function likeRecipe(recipeObj, clicked_btn) {
 
 function removeFavouriteRecipe(recipe_id) {
   const favouriteRecipes = JSON.parse(localStorage.getItem("favouriteRecipes"));
-  const index = favouriteRecipes.findIndex(el => el.id === recipe_id);
+  const index = favouriteRecipes.findIndex((el) => el.id === recipe_id);
   favouriteRecipes.splice(index, 1);
 
   localStorage.setItem("favouriteRecipes", JSON.stringify(favouriteRecipes));
@@ -843,7 +843,7 @@ function checkRecipeInFavourites(recipe_id) {
 
   if (favourites) {
     const favouritesArr = JSON.parse(favourites);
-    const index = favouritesArr.findIndex(recipe => recipe.id === recipe_id);
+    const index = favouritesArr.findIndex((recipe) => recipe.id === recipe_id);
 
     if (index === -1) {
       return false;
@@ -864,7 +864,7 @@ function checkItemInCheckbox(checkboxField, checkboxString, inputType) {
       $("#clearFiltersBtn").css("visibility", "visible");
     } else {
       const valueArr = textInput.split(", ");
-      const index = valueArr.findIndex(el => el === checkboxString);
+      const index = valueArr.findIndex((el) => el === checkboxString);
       valueArr.splice(index, 1);
       if (valueArr.length > 1) {
         $(`#${inputType}-text-input`).val(valueArr.join(", "));
@@ -891,8 +891,8 @@ async function autocompleteIngredientName(input, inputType) {
       if (responseParsed.length > 0) {
         let resultsMarkup = "";
         $(`#${inputType}-ingredients-dropdown`).empty();
-        responseParsed.forEach(ingredient => {
-          const nameArr = ingredient.name.split(" ").map(name => name.capitalize());
+        responseParsed.forEach((ingredient) => {
+          const nameArr = ingredient.name.split(" ").map((name) => name.capitalize());
           resultsMarkup += `<div class="dropdown-item" onclick="updateInputFieldAutocomplete('${nameArr.join(
             " "
           )}', '${inputType}');"><img width="50px" height="50px" style="object-fit: cover" class="rounded mr-3" src="https://spoonacular.com/cdn/ingredients_250x250/${ingredient.image}">${nameArr.join(" ")}</div>`;
@@ -943,7 +943,7 @@ function removeBadge(badge) {
 function getIngredientValues(inputType) {
   const badgesArr = document.querySelector(`#${inputType}d-ingredients`).querySelectorAll(".badge");
   const results = [];
-  badgesArr.forEach(el => {
+  badgesArr.forEach((el) => {
     results.push(el.innerText);
   });
 
@@ -1017,7 +1017,7 @@ function removeNutrientRow(nutrient_id) {
   searchFilterInputs[1] = document.getElementById("mealType-text-input");
   searchFilterInputs[2] = document.getElementById("intolerance-text-input");
 
-  searchFilterInputs.forEach(input => {
+  searchFilterInputs.forEach((input) => {
     if (input.value.length > 0 && input.value !== "null") {
       test++;
     }
@@ -1141,7 +1141,7 @@ async function performSearch(clicked_btn) {
       } else {
         $("#results-table").empty();
         $("#pagination-container").hide();
-        responseParsed.results.forEach(result => createSearchResultsItem(result));
+        responseParsed.results.forEach((result) => createSearchResultsItem(result));
       }
     } else {
       $("#results-header").addClass("text-center");
@@ -1224,21 +1224,21 @@ function clearAllFilters(clicked_btn) {
   $("#nutrients-table").empty();
 
   const checkboxes = document.querySelectorAll(".custom-checkbox");
-  checkboxes.forEach(el => {
+  checkboxes.forEach((el) => {
     el.querySelector("input").checked = false;
   });
 
   clicked_btn.style.visibility = "hidden";
 }
 
-(function() {
+(function () {
   const searchFilterInputs = [];
   searchFilterInputs[0] = document.getElementById("diet-filter");
   searchFilterInputs[1] = document.getElementById("mealType-text-input");
   searchFilterInputs[2] = document.getElementById("intolerance-text-input");
 
-  searchFilterInputs.forEach(input => {
-    input.addEventListener("change", function() {
+  searchFilterInputs.forEach((input) => {
+    input.addEventListener("change", function () {
       $("#clearFiltersBtn").css("visibility", "visible");
     });
   });
@@ -1305,7 +1305,7 @@ function createMealPlanQueryString() {
 }
 
 function createWeekMealPlanHTML(dataObj, localStorage = false) {
-  Object.keys(dataObj.week).forEach(day => {
+  Object.keys(dataObj.week).forEach((day) => {
     let mealCards = "";
     const nutrientsObj = dataObj.week[day].nutrients;
     let nutritionData = `<div class="row mt-2">
@@ -1349,14 +1349,14 @@ function createWeekMealPlanHTML(dataObj, localStorage = false) {
   });
 
   const navTabs = document.getElementById("list-tab").querySelectorAll(".list-group-item");
-  navTabs.forEach(tab => {
+  navTabs.forEach((tab) => {
     if (tab.classList.contains("active")) {
       tab.classList.remove("active");
     }
   });
 
   const tabsContainers = document.getElementById("tab-content-containers").querySelectorAll(".tab-pane");
-  tabsContainers.forEach(container => {
+  tabsContainers.forEach((container) => {
     if (container.classList.contains("show") && container.classList.contains("active")) {
       container.classList.remove("show");
       container.classList.remove("active");
@@ -1520,7 +1520,7 @@ async function getConversationSuggestions(query) {
 
       if (responseParsed.suggests._.length > 0) {
         $("#suggestions-list").empty();
-        responseParsed.suggests._.forEach(suggestion => {
+        responseParsed.suggests._.forEach((suggestion) => {
           const markUp = `<a href="#" style="padding: 5px 15px !important;" class="list-group-item list-group-item-action" onclick="appendQuestionToInput(this)">${suggestion.name}</a>`;
           $("#suggestions-list").append(markUp);
         });
@@ -1609,7 +1609,7 @@ function welcomeBackTypeWriter() {
 
 function changeWineFilters(input_value) {
   const allInputs = document.querySelectorAll(".wine-inputs");
-  allInputs.forEach(input => (input.style.display = "none"));
+  allInputs.forEach((input) => (input.style.display = "none"));
   $(`#${input_value}-inputTab`).show(700);
 }
 
@@ -1659,7 +1659,7 @@ async function getWinesHandler(type, clicked_btn) {
     }
 
     $(`#${type}-input`).val("");
-    clicked_btn.disabled = false;
+    clicked_btn.disabled = true;
     clicked_btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit';
   } catch (err) {
     console.log(err);
@@ -1708,7 +1708,7 @@ function createWinePairingAlert(response, food) {
             <button data-item='${JSON.stringify({
               id: product.id,
               title: product.title,
-              imageUrl: product.imageUrl
+              imageUrl: product.imageUrl,
             })}' onclick='addToShoppingList("wines", this)' class="btn btn-success btn-sm mb-3" style="position: absolute; right: 10px; bottom: 0px; margin-top: 10px" ${checkLS === true ? "disabled" : ""}>${
         checkLS === false ? '<i class="fas fa-list-ul mr-2"></i>Add to shopping list' : '<i class="fas fa-check mr-1"></i>Added to the list'
       }</button>
@@ -1749,7 +1749,7 @@ function createWineDescriptionAlert(response, wine) {
 function createWineRecommendationAlert(response, wine) {
   let cardsMarkup = "";
   if (response.recommendedWines.length > 0) {
-    response.recommendedWines.forEach(product => {
+    response.recommendedWines.forEach((product) => {
       let description;
       if (product.description !== null) {
         description = product.description;
@@ -1773,7 +1773,7 @@ function createWineRecommendationAlert(response, wine) {
               <button data-item='${JSON.stringify({
                 id: product.id,
                 title: product.title,
-                imageUrl: product.imageUrl
+                imageUrl: product.imageUrl,
               })}' onclick='addToShoppingList("wines", this)' class="btn btn-success btn-sm mb-3" style="position: absolute; right: 10px; bottom: 0px; margin-top: 10px" ${checkLS === true ? "disabled" : ""}>${
         checkLS === false ? '<i class="fas fa-list-ul mr-2"></i>Add to shopping list' : '<i class="fas fa-check mr-1"></i>Added to the list'
       }</button>

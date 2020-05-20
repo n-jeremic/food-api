@@ -488,11 +488,17 @@ function createRecipeSummary(recipeObj, searchTab) {
   }
 
   const checkLike = checkRecipeInFavourites(recipeObj.id);
+  if (recipeObj.title.includes("'")) {
+    recipeObj.title = recipeObj.title.split("'").join("");
+  }
+
   if (checkLike) {
     buttonsMarkUp += `<p style="margin-bottom: 0px !important"><button class="btn btn-danger mr-4" disabled>Added to favourites<i class="fas fa-heart ml-2"></i></button>${historyBtn}</p>`;
   } else {
     const recipeObjModified = { id: recipeObj.id, title: recipeObj.title, image: recipeObj.image };
-    buttonsMarkUp += `<p style="margin-bottom: 0px !important"><button class="btn btn-danger mr-4" onclick='likeRecipe(${JSON.stringify(recipeObjModified)}, this)'>Add to favourites<i class="far fa-heart ml-2"></i></button>${historyBtn}</p>`;
+    buttonsMarkUp += `<p style="margin-bottom: 0px !important"><button id="btn-like-${recipeObj.id}" class="btn btn-danger mr-4" onclick='likeRecipe(${JSON.stringify(
+      recipeObjModified
+    )}, this)'>Add to favourites<i class="far fa-heart ml-2"></i></button>${historyBtn}</p>`;
   }
 
   $("#recipe-summary-buttons" + searchTab).empty();
@@ -626,7 +632,6 @@ function createWinePairingTab(winePairingObj, searchTab) {
             `<button class='btn btn-success btn-sm float-right' style="position: absolute; right: 20px" data-item='${JSON.stringify({
               id: product.id,
               title: product.title,
-              imageUrl: product.imageUrl,
             })}' onclick='addToShoppingList("wines", this)'><i class="fas fa-list-ul mr-2"></i>Add to shopping list</button>`
         );
       }
@@ -825,6 +830,7 @@ function likeRecipe(recipeObj, clicked_btn) {
     $("#favRecipes-badge").text(recipes.length);
   }
 
+  clicked_btn.innerHTML = "";
   clicked_btn.innerHTML = 'Added to favourites<i class="fas fa-heart ml-2"></i>';
   clicked_btn.disabled = true;
 }

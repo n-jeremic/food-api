@@ -1,5 +1,5 @@
-// const apiKey = "791d9715b9454e049e21c5c9b46ca8df";
-const apiKey = "1fa9fd007ea14a9db14691c266865645";
+const apiKey = "791d9715b9454e049e21c5c9b46ca8df";
+// const apiKey = "1fa9fd007ea14a9db14691c266865645";
 let searchResultsGlobal;
 let chatbotDisplayed = false;
 
